@@ -1,9 +1,15 @@
-const PLAYER = {};
+import { data } from "./data.js";
 
-const audio = new Audio("../media/dengue_fever_seeing_hands.mp3");
+// const PLAYER = {};
 
-console.log(audio);
+// const audio = new Audio("../media/dengue_fever_seeing_hands.mp3");
 
-audio.addEventListener("loadeddata", () => {
-  console.log(audio.duration);
+// console.log(audio);
+
+// audio.addEventListener("loadeddata", () => {
+//   console.log(audio.duration);
+// });
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log(data);
 });
