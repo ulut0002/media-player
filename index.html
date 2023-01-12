@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Player</title>
+    <script src="./js/main.js" defer></script>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <div class="container">
+        <div class="player__container">
+          <div class="player">
+            <!-- Top section -->
+            <section class="player__header">Player Header</section>
+            <!-- Top section - end -->
+
+            <!-- Album art -->
+            <div class="album__art__container">
+              <img src="#" alt="" class="album__art__image" />
+              <button id="btnShuffle" title="shuffle">
+                <span class="material-symbols-outlined">shuffle</span>
+              </button>
+            </div>
+            <!-- Album art - end -->
+
+            <!-- Playlist -->
+            <ul class="playlist">
+              <li class="track__item">
+                <div class="track__thumb">
+                  <img src="" alt="" />
+                </div>
+                <div class="track__details">
+                  <div class="track__title">Song title</div>
+                  <div class="track__artist">Song Artist</div>
+                </div>
+                <div class="track__time">
+                  <time datetime="">00:00</time>
+                </div>
+              </li>
+            </ul>
+            <!-- Playlist - end -->
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer></footer>
+  </body>
+</html>
