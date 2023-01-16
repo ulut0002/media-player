@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Media Player</title>
-    <script src="./js/main.js" type="module"></script>
-    <script src="./js/player.js" type="module"></script>
+    <script src="./js/main.js" type="module" defer></script>
+    <!-- <script src="./js/player.js" type="module" defer></script> -->
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
       rel="stylesheet"
@@ -18,36 +18,37 @@
     <main>
       <div class="container">
         <div class="player__container">
-          <div class="player">
+          <div class="player" data-player="player">
             <!-- Top section -->
-            <section class="player__header">Player Header</section>
+            <section class="player__header border-green" data-player="header">
+              Enjoy the playlist
+            </section>
             <!-- Top section - end -->
 
             <!-- Album art -->
-            <div class="album__art__container">
-              <img src="#" alt="" class="album__art__image" />
-              <button id="btnShuffle" title="shuffle">
+            <div class="current__track__container border-red" data-player="art">
+              <img
+                src="#"
+                alt=""
+                class="album__art__image"
+                data-player="art-image"
+              />
+              <button id="btnShuffle" title="shuffle" data-player="btn-shuffle">
                 <span class="material-symbols-outlined">shuffle</span>
               </button>
             </div>
             <!-- Album art - end -->
 
             <!-- Playlist -->
-            <ul class="playlist">
-              <li class="track__item">
-                <div class="track__thumb">
-                  <img src="" alt="" />
-                </div>
-                <div class="track__details">
-                  <div class="track__title">Song title</div>
-                  <div class="track__artist">Song Artist</div>
-                </div>
-                <div class="track__time">
-                  <time datetime="">00:00</time>
-                </div>
-              </li>
-            </ul>
+            <ul
+              role="list"
+              data-player="playlist"
+              class="playlist border-cyan"
+            ></ul>
             <!-- Playlist - end -->
+            <section data-player="progress" class="progress border-green">
+              Progress bar
+            </section>
           </div>
         </div>
       </div>

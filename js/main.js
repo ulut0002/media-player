@@ -1,4 +1,5 @@
 import { data } from "./data.js";
+import { Player, DOM } from "./player.js";
 
 // const PLAYER = {};
 
@@ -11,5 +12,8 @@ import { data } from "./data.js";
 // });
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log(data);
+  // console.log("a");
+  Player.init();
 });
+
+// console.log("a");
