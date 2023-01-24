@@ -227,7 +227,7 @@ class Player extends HTMLElement {
         subElement.innerHTML = track.artist;
         trackEl.append(subElement);
 
-        const path = "../" + this.#mediaPath + track.file;
+        const path = this.#mediaPath + track.file;
         // const path1 = new URL("util.js").pathname;
         // console.log(path1);
         console.log("track path", path);
