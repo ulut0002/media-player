@@ -17,6 +17,8 @@ template.innerHTML = `
         1fr
         minmax(min-content, max-content);
       background-color: var(--background-color);
+      
+      
       color: var(--font-color);
       padding: 0;
       margin: 0;
@@ -29,6 +31,8 @@ template.innerHTML = `
       border: none;
       padding: 0;
       margin: 0;
+      background-color: var(--header-main-bg);
+      background-image:  var(--header-background-gradient);
     }
     
     .preview {
@@ -42,7 +46,7 @@ template.innerHTML = `
     .playlist {
       grid-column: 1 / 2;
       grid-row: 4 / 5;
-    
+
       background-color: green;
     }
     
@@ -82,6 +86,7 @@ template.innerHTML = `
         grid-column: 2 / 3;
         grid-row: 2 / 4;
         background-color: green;
+
       }
     
       .controls {

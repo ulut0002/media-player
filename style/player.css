@@ -165,6 +165,10 @@ by R Min Max
   --background-color: ghostwhite;
   --font-color: #150228;
 
+  /* global  */
+  --gradient-1: linear-gradient(306deg, #0f4053 0%, #9face6 100%);
+  --gradient-2: linear-gradient(306deg, #4b6483 0%, #9face6 100%);
+
   /* track */
   --track-thumbnail-border-color: "";
   --track-artist-color: "";
@@ -182,30 +186,41 @@ by R Min Max
   /* end of track */
 
   /* header section */
+  --header-main-bg: #0f4053;
+  --header-background-gradient: var(--gradient-2);
+  --header-background-color: ghostwhite;
   --header-font-style: "Itim", sans-serif;
   --header-text-color: #534e7b;
   --header-text-hover-color: #393556;
   --header-border-radius: 1rem;
   --header-border-color: var(--header-text-color);
-  --header-border-width: 0.33rem;
+  --header-border-width: 0.2rem;
+
   /* header section ends */
 
   /* preview section */
+  /* Linear gradient by https://cssgradient.io/ */
+  --preview-background: #0f4053;
+  --preview-background-gradient: var(--gradient-1);
   --preview-track-size: var(--font-h4);
-  --preview-track-color: #413d61;
-  --preview-artist-color: #475c7a;
+  --preview-track-color: #210c36;
+  --preview-artist-color: #dbd9de;
   --preview-artist-size: var(--font-h6);
   /* end of preview section */
 
   /* control section */
-  --progress-background-color: #87a2c7;
-  --progress-height: 0.5rem;
-  --progress-color: "";
+  --progress-background-color: #aca1b0;
+  --progress-height: 0.55rem;
+  --progress-color: #fae24c;
   --progress-button-color: "";
   --progress-button-size: "";
   --progress-button-hover-color: "";
   --progress-remaining-time-color: "";
   --progress-remaining-time-size: "";
+  --controls-background-color: var(--header-main-bg);
+  --controls-color: #ffeee3;
+  --controls-hover-color: #fae24c;
+  --controls-hover-scale: 1.17;
   /* end of control section */
 
   /* track styling */

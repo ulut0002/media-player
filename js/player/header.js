@@ -5,10 +5,16 @@ template.innerHTML = `
       display: block;
       border: var(--header-border-width) solid var(--header-border-color);
       border-radius: var(--header-border-radius);
+      background-color: var(--header-background-color);
+
       font-family: var(--font-family);
       color: var(--header-text-color);
       --animation-delay: 0ms;
       --scale-rate: 1.8;
+    }
+
+    .container{
+  
     }
     
     .header {
@@ -16,6 +22,7 @@ template.innerHTML = `
       justify-content: center;
       gap: 0.25rem;
       align-items: center;
+      
     }
     
     slot[name="title"]::slotted(*),
@@ -115,6 +122,7 @@ template.innerHTML = `
 
   </style>
   
+  <div class="container">
   <div id="header" class="header">
     <span class="material-symbols-outlined note-color-1 animate-up-down ">music_note</span>
     <span class="material-symbols-outlined note-color-2 animate-up-down delay1">music_note</span>    
@@ -128,6 +136,7 @@ template.innerHTML = `
     
 
 
+  </div>
   </div>
 
 

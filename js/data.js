@@ -10,6 +10,13 @@ const data = {
       file: "paul_mccartney_michael_jackson_say_say_say.mp3",
     },
     {
+      name: "Break my Heart",
+      artist: "Dua Lipa",
+      art_cover: "dua_lipa_break_my_heart.jpeg",
+      thumbnail: "dua_ipa_break_my_heart-thumbnail.png",
+      file: "dua_lipa_break_my_heart.mp3",
+    },
+    {
       name: "Fade into You",
       artist: "Mazzy Star",
       art_cover: "mazzy_star_fade_into_you.jpeg",
