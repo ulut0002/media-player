@@ -431,8 +431,21 @@ class Preview extends HTMLElement {
   }
 
   replaceImage(ev) {
-    console.log("now move: ", ev);
+    console.log("values: ", "1: ", ev.image, "2: ", this.#image.src);
 
+    /*
+    TODO: 
+
+      val 1:  ./img/paul_mccartney_michael_jackson_say_say_say.jpeg 
+      val 2:  http://127.0.0.1:5501/img/paul_mccartney_michael_jackson_say_say_say.jpeg
+
+     must find a way to match them
+    */
+    if (ev.image.toLowerCase() == this.#image.src.toLowerCase()) {
+      console.log("caught");
+      return;
+    }
+    // return;
     this.#artistNameDiv.innerHTML = "";
     this.#trackNameDiv.innerHTML = "";
 
