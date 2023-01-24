@@ -1,0 +1,20 @@
+<div id="track" class="track">
+  <div id="image" class="image">
+    <slot name="image" class="image">Image</slot>
+   </div>
+    <div id="title" class="title">
+        <slot name="title">Title</slot>
+    </div>
+    <div id="artist" class="artist">
+        <slot name="artist">Artist</slot>
+    </div>
+    <div id="duration" class="duration">
+        <slot name="duration">Duration</slot>
+    </div>
+
+    <div id="controls" class="controls">
+        <button id="btn-play">play</button>
+        <button id="btn-pause">pause</button>
+        <button id="btn-remove">remove</button>
+    </div>
+</div>

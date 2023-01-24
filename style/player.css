@@ -1,0 +1,287 @@
+@import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,400;0,700;1,400;1,700&family=Itim&display=swap");
+
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl,
+dd {
+  margin: 0 0 1.5rem;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+html {
+  line-height: 1.5;
+  font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* A elements that don't have a class get default styles */
+a {
+  text-decoration-skip-ink: auto;
+  color: #36bf7f;
+}
+
+a:hover,
+a:focus {
+  color: #d96666;
+}
+
+/* Make images easier to work with */
+img,
+picture,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+svg {
+  fill: currentColor;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ################# */
+/* CSS  */
+
+/*
+Inspiration for colors and icons: 
+
+1) https://dribbble.com/shots/15103813-Music-playe-Light-mood 
+2) https://dribbble.com/shots/15097345-Music-playe-Dark-mood
+
+by R Min Max
+*/
+
+:root {
+  --font-family: "Chivo", Roboto, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif !important;
+
+  --breakpoint-1: 45rem;
+  --breakpoint-2: 60rem;
+
+  /* Major second */
+  --font-h1: 1.802rem;
+  --font-h2: 1.602rem;
+  --font-h3: 1.424rem;
+  --font-h4: 1.266rem;
+  --font-h5: 1.125rem;
+  --font-small: 0.889rem;
+  --font-xs: 0.75rem;
+  --note-size: 1.3rem;
+  --control-icon-size: 2.4rem;
+
+  --header-font-color: hsl(8, 69%, 28%);
+  --header-font-color-hover: hsl(8, 69%, 58%);
+
+  --bg-white-1: #fbf8f9;
+  --bg-color-1: #fbf8f9;
+  --font-color-1: #150228;
+  --font-color-2: #aca1b0;
+  --fill-color-1: #ee3f82;
+
+  /* Used for buttons and fills */
+  --primary-color-dark: hsl(17, 60%, 41%);
+  --primary-color: hsl(17, 60%, 51%);
+  --primary-color-light: hsl(17, 60%, 61%);
+  --primary-color-lighter: hsl(17, 60%, 81%);
+
+  --color: hsl(7, 100%, 57%);
+
+  /* It is orange over white background */
+  --bg-color-dark: hsl(26, 37%, 88%);
+  --bg-color: hsl(0, 0%, 97%);
+  --bg-color: white;
+  --bg-color-light: hsl(10, 17%, 100%);
+
+  /* text and buttons will have black filling */
+  --accent-color: #121212;
+
+  --text-color: #121212;
+  --text-color-light: hsl(0, 0%, 33%);
+
+  /*component variables*/
+  /* body */
+  --background-color: ghostwhite;
+  --font-color: #150228;
+
+  /* track */
+  --track-thumbnail-border-color: "";
+  --track-artist-color: "";
+  --track-name-color: "";
+  --track-duration-color: "";
+  --track-border-color: "";
+
+  --track-hover-background-color: "";
+  --track-hover-artist-color: "";
+  --track-hover-name-color: "";
+  --track-hover-duration-color: "";
+  --track-hover-border-color: "";
+
+  --track-gap: "";
+  /* end of track */
+
+  /* header section */
+  --header-font-style: "Itim", sans-serif;
+  --header-text-color: #534e7b;
+  --header-text-hover-color: #393556;
+  --header-border-radius: 1rem;
+  --header-border-color: var(--header-text-color);
+  --header-border-width: 0.33rem;
+  /* header section ends */
+
+  /* preview section */
+  --preview-track-size: var(--font-h4);
+  --preview-track-color: #413d61;
+  --preview-artist-color: #475c7a;
+  --preview-artist-size: var(--font-h6);
+  /* end of preview section */
+
+  /* control section */
+  --progress-background-color: #87a2c7;
+  --progress-height: 0.5rem;
+  --progress-color: "";
+  --progress-button-color: "";
+  --progress-button-size: "";
+  --progress-button-hover-color: "";
+  --progress-remaining-time-color: "";
+  --progress-remaining-time-size: "";
+  /* end of control section */
+
+  /* track styling */
+  --track-bg-color-2: #fbf8f9;
+  --track-bg-color-1: #ffc3d7;
+  --track-hover-bg-color-2: #fbf8f9;
+  --track-hover-bg-color-1: #ffc3d7;
+  --track-hover-bg-color-2: #c7b5bb;
+  --track-hover-bg-color-1: #715a61;
+  --track-name-text-color: var(--font-color-1);
+  --track-artist-text-color: var(--font-color-2);
+}
+
+.dark-mode {
+  --bg-color-1: #000128;
+  --font-color-1: #f1eafa;
+  --fill-color-1: #ee3f82;
+}
+
+html {
+  font-family: var(--font-family);
+}
+
+.small-text {
+  font-size: var(--font-small);
+}
+
+h1 {
+  font-size: var(--font-h1);
+}
+
+h2 {
+  font-size: var(--font-h2);
+}
+
+h3 {
+  font-size: var(--font-h3);
+}
+
+h4 {
+  font-size: var(--font-h4);
+}
+
+h5 {
+  font-size: var(--font-h5);
+}
+
+div {
+  /* border: 4px solid green; */
+}
+
+/* @media only screen and (min-width: var(--breakpoint-1)) { */
+@media only screen and (min-width: 45rem) {
+  :root {
+    /* minor third */
+    --font-h1: 2.488rem;
+    --font-h2: 2.074rem;
+    --font-h3: 1.728rem;
+    --font-h4: 1.44rem;
+    --font-h5: 1.2rem;
+    --font-small: 0.833rem;
+    --note-size: 2rem;
+    --control-icon-size: 2.9rem;
+  }
+}
+
+@media only screen and (min-width: 60rem) {
+  :root {
+    /* major third */
+    --font-h1: 3.052rem;
+    --font-h2: 2.441rem;
+    --font-h3: 1.953rem;
+    --font-h4: 1.563rem;
+    --font-h5: 1.25rem;
+    --font-small: 0.8rem;
+    --note-size: 3rem;
+    --control-icon-size: 3.3rem;
+  }
+}

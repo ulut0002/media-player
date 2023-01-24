@@ -1,0 +1,12 @@
+dispatch events
+
+<playerid>-<songid>-play
+<playerid>-<songid>-pause
+<playerid>-<songid>-restart
+<playerid>-<songid>-rewind-10
+<playerid>-<songid>-skip-10
+<playerid>-<songid>-next
+<playerid>-<songid>-download
+
+
+

@@ -4,55 +4,29 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Media Player</title>
-    <script src="./js/main.js" type="module" defer></script>
-    <!-- <script src="./js/player.js" type="module" defer></script> -->
+    <title>Document</title>
+
+    <script src="./js/player/player.js" type="module" defer></script>
+    <script src="./js/app.js" type="module" defer></script>
+    <link rel="stylesheet" href="./style/player.css" />
     <link
-      href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
     />
-    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <header></header>
-    <main>
-      <div class="container">
-        <div class="player__container">
-          <div class="player" data-player="player">
-            <!-- Top section -->
-            <section class="player__header border-green" data-player="header">
-              Enjoy the playlist
-            </section>
-            <!-- Top section - end -->
-
-            <!-- Album art -->
-            <div class="current__track__container border-red" data-player="art">
-              <img
-                src="#"
-                alt=""
-                class="album__art__image"
-                data-player="art-image"
-              />
-              <button id="btnShuffle" title="shuffle" data-player="btn-shuffle">
-                <span class="material-symbols-outlined">shuffle</span>
-              </button>
-            </div>
-            <!-- Album art - end -->
-
-            <!-- Playlist -->
-            <ul
-              role="list"
-              data-player="playlist"
-              class="playlist border-cyan"
-            ></ul>
-            <!-- Playlist - end -->
-            <section data-player="progress" class="progress border-green">
-              Progress bar
-            </section>
-          </div>
-        </div>
-      </div>
-    </main>
-    <footer></footer>
+    <div id="player-container"></div>
   </body>
 </html>
+
+<!-- 
+        <single-track
+        file="file.mp3"
+        thumbnail="thumbnail.jpeg"
+        image="file.jpeg"
+      >
+        <span slot="title">Shake if off</span>
+        <span slot="duration">3:47</span>
+        <span slot="artist">Taylor Swift</span>
+      </single-track> 
+    -->
