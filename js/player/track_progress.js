@@ -136,6 +136,9 @@ class TrackProgress extends HTMLElement {
               if (this.#data.range && ev.detail.percentage) {
                 this.#data.range.value = ev.detail.percentage;
               }
+              this.#data.remainingTime.textContent =
+                ev.detail.duration - ev.detail.currentPosition;
+              this.#data.playedTime.textContent = ev.detail.currentPosition;
             }
           );
 

@@ -45,11 +45,11 @@ const data = {
       file: "d4vd_here_with_me.mp3",
     },
     {
-      name: "A Hard Day's Night",
-      artist: "D.E.F Orkestra",
-      art_cover: "def_orkestra_a_hard_days_night.jpeg",
-      thumbnail: "def_orkestra_a_hard_days_night-thumbnail.jpeg",
-      file: "def_orkestra_a_hard_days_night.mp3",
+      name: "Borgin",
+      artist: "Hjalmar",
+      art_cover: "hjalmar_borgin.jpeg",
+      thumbnail: "hjalmar_borgin-thumbnail.jpeg",
+      file: "hjalmar_borgin.mp3",
     },
     {
       name: "Seeing Hands",
@@ -81,11 +81,11 @@ const data = {
       file: "morcheeba_public_displays_of_affection.mp3",
     },
     {
-      name: "Azize Diskotekte",
-      artist: "Osman İşmen",
-      art_cover: "osman_ismen_orkestrasi_azize_diskotekte.jpeg",
-      thumbnail: "osman_ismen_orkestrasi_azize_diskotekte-thumbnail.jpeg",
-      file: "osman_ismen_orkestrasi_azize_diskotekte.mp3",
+      name: "Soirée mousse",
+      artist: "Delphine Dupont, Gérôme Gallo",
+      art_cover: "delphine_dupont_gerome_gallo_soiree_mousse.jpeg",
+      thumbnail: "delphine_dupont_gerome_gallo_soiree_mousse-thumbnail.jpeg",
+      file: "delphine_dupont_gerome_gallo_soiree_mousse.mp3",
     },
   ],
 };
