@@ -2,6 +2,8 @@ import Track from "./track.js";
 import Header from "./header.js";
 import Preview from "./preview.js";
 import Controls from "./controls.js";
+import VolumeSlider from "./volume-slider.js";
+import TrackProgress from "./track_progress.js";
 
 import { generateRandomString } from "./util.js";
 
@@ -100,6 +102,7 @@ template.innerHTML = `
       
   </style>
   
+
   <div id="player" class="container">
         <div id="header" class="header">
           <ulut0002-header >
@@ -113,8 +116,14 @@ template.innerHTML = `
         </div> 
         
         <div id="playlist" class="playlist"></div>
-        <ulut0002-controls></ulut0002-controls>
+        <ulut0002-controls id="controls"></ulut0002-controls>
+
+        
     </div>
+
+
+
+
 
     
 `;
@@ -130,6 +139,7 @@ class Player extends HTMLElement {
   #playlistDiv = undefined;
   #headerDiv = undefined;
   #previewDiv = undefined;
+  #controlDiv = undefined;
 
   constructor() {
     super();
@@ -145,10 +155,11 @@ class Player extends HTMLElement {
       console.log(this.player_key);
     }
 
-    //some global elements..
     this.#playerDiv = this.root.getElementById("player");
     this.#playlistDiv = this.root.getElementById("playlist");
     this.#headerDiv = this.root.getElementById("header");
+    this.#controlDiv = this.root.getElementById("controls");
+
     this.#previewDiv = this.root
       .getElementById("preview")
       .querySelector("ulut0002-preview");
@@ -235,13 +246,15 @@ class Player extends HTMLElement {
         const path = this.#mediaPath + track.file;
         // const path1 = new URL("util.js").pathname;
         // console.log(path1);
-        console.log("track path", path);
+        // console.log("track path", path);
         trackEl.setAttribute("file", path);
         trackEl.setAttribute("thumbnail", this.#imagePath + track.thumbnail);
         trackEl.setAttribute("image", this.#imagePath + track.art_cover);
-        trackEl.setAttribute("player_key", this.player_key);
 
+        //set player_key for all sub-elements
+        trackEl.setAttribute("player_key", this.player_key);
         this.#previewDiv.setAttribute("player_key", this.player_key);
+        this.#controlDiv.setAttribute("player_key", this.player_key);
 
         this.#playlistDiv.append(trackEl);
       });

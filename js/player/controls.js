@@ -1,3 +1,6 @@
+import VolumeSlider from "./volume-slider.js";
+import TrackProgress from "./track_progress.js";
+
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -6,10 +9,11 @@ template.innerHTML = `
   }
   
   .container {
-    display: grid;
-    grid-template-columns: 1fr minmax(min-content, max-content);
-    grid-template-rows: 1fr minmax(min-content, max-content);
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
   }
   
   .progress_bar {
@@ -45,13 +49,20 @@ template.innerHTML = `
     top: 0;
   }
   .control__container {
-    grid-column: 1 / 2;
+    grid-column: 1 / -1;
     grid-row: 2/ 3;
     text-align: center;
+    // margin-right: 0;
+    
     display: flex;
-    gap: 1rem;
-    justify-content: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-start;
     margin: 0.25rem 0;
+  }
+
+  .end{
+    align-self: flex-end;
   }
   
   .player-control-icon {
@@ -77,6 +88,7 @@ template.innerHTML = `
     color: var(--controls-color) !important;
     display: flex;
     justify-content: center;
+
     align-items: center;
     
   }
@@ -93,25 +105,29 @@ template.innerHTML = `
     width: auto;
   }
 
-  </style>
-  <div id="container" class="container">
-  <div id="progress__bar" class="progress_bar">
-    <div id="progress_background" class="background">&nbsp;</div>
-    <div id="progress_ticker" class="ticker">&nbsp;</div>
-  </div>
+  .volume{
+    align-self: flex-start;
+    margin-right: 2rem;
 
-  <div id="play__controls__container" class="play__controls__container"></div>
+  }
+
+  </style>
+
+  <div id="container" class="container">
+
+    <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
 
   <div id="control__container" class="control__container">
+
     <span
-      class="material-symbols-outlined player-control-icon"
+      class="material-symbols-outlined player-control-icon center"
       title="Previous track"
       id="skip_previous"
     >
       skip_previous
     </span>
 
-    <span class="material-symbols-outlined player-control-icon"  id="play_track">
+    <span class="material-symbols-outlined player-control-icon center"   id="play_track">
       play_circle
     </span>
 
@@ -136,6 +152,8 @@ template.innerHTML = `
     </slot>
   </div>
 
+  <ulut0002-volume class="volume"></ulut0002-volume>
+
   <div id="timer" class="timer">
     <span class="current">1:12/</span>
     <span class="total">3:46</span>
@@ -145,7 +163,10 @@ template.innerHTML = `
 `;
 
 class Controls extends HTMLElement {
-  #data = {};
+  #data = {
+    player_key: "",
+  };
+
   constructor() {
     super();
 
@@ -171,6 +192,8 @@ class Controls extends HTMLElement {
     this.#data.btnShuffle = this.root.getElementById("shuffle");
     this.#data.btnRepeat = this.root.getElementById("repeat");
     this.#data.btnRepeatOne = this.root.getElementById("repeat_one");
+
+    this.#data.progressEl = this.root.getElementById("progress");
 
     if (this.#data.containerDiv) {
       this.#data.containerDiv.addEventListener("click", (ev) => {
@@ -204,6 +227,41 @@ class Controls extends HTMLElement {
       default:
         break;
     }
+  }
+
+  static get observedAttributes() {
+    return ["player_key"];
+  }
+
+  get player_key() {
+    return this.getAttribute("player_key");
+  }
+
+  set player_key(value) {
+    this.#data.player_key = value;
+    this.setAttribute("player_key", value);
+  }
+
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    let rebuild = false;
+    if (oldVal != newVal) {
+      attrName = attrName.toLowerCase().trim();
+
+      switch (attrName) {
+        case "player_key":
+          this.#data.player_key = newVal;
+          if (this.#data.progressEl)
+            this.#data.progressEl.player_key = this.#data.player_key;
+
+          rebuild = true;
+          break;
+      }
+    }
+  }
+
+  connectedCallback() {
+    if (this.#data.progressEl)
+      this.#data.progressEl.player_key = this.#data.player_key;
   }
 
   pauseTrack(ev) {

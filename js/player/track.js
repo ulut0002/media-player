@@ -1,5 +1,5 @@
 import { convertSecondsToHMSString, generateRandomString } from "./util.js";
-import { playEvent } from "./player-event.js";
+import { playEvent, trackIsPlaying } from "./player-event.js";
 
 const template = document.createElement("template");
 
@@ -108,6 +108,7 @@ class Track extends HTMLElement {
     audio: null,
     duration: null,
     durationText: null,
+    pauseOnTimeUpdate: false,
   };
 
   #headerDiv;
@@ -218,6 +219,26 @@ class Track extends HTMLElement {
 
   disconnectedCallback() {}
 
+  updateVolume(data) {
+    if (this.#data.audio) {
+      this.#data.audio.volume = data.volume / 100;
+    }
+  }
+
+  // @data.position represents a percentage
+  seekPosition(data) {
+    const position = data.position ? data.position : 0;
+    if (this.#data.audio) {
+      // console.log("outside");
+
+      const duration = this.#data.audio.duration;
+      const seekPos = (data.position * duration) / 100;
+      this.#data.audio.currentTime = seekPos;
+
+      // this.#data.audio.currentTime = data.volume / 100;
+    }
+  }
+
   connectedCallback() {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       if (ev.detail.id === this.#data.id) {
@@ -231,6 +252,27 @@ class Track extends HTMLElement {
           this.#data.audio.pause();
         }
       }
+
+      document.addEventListener(
+        `change-volume-${this.#data.player_key}`,
+        (ev) => {
+          this.updateVolume.call(this, ev.detail);
+        }
+      );
+
+      document.addEventListener(
+        `pause-on-timer-update-${this.#data.player_key}`,
+        (ev) => {
+          this.#data.pauseOnTimeUpdate = ev.detail.enable;
+        }
+      );
+
+      document.addEventListener(
+        `seek-position-${this.#data.player_key}`,
+        (ev) => {
+          this.seekPosition.call(this, ev.detail);
+        }
+      );
     });
 
     //TODO:
@@ -269,6 +311,11 @@ class Track extends HTMLElement {
       if (this.#data.audio) {
         this.#data.audio.addEventListener("loadedmetadata", () => {
           this.handleDurationRetrieval.call(this);
+        });
+
+        this.#data.audio.addEventListener("timeupdate", () => {
+          // console.log("registered");
+          this.handleOnTimeUpdate.call(this);
         });
       }
     }
@@ -345,6 +392,20 @@ class Track extends HTMLElement {
     this.#data.durationText = formattedText;
     const el = this.root.querySelector("[name='duration']");
     if (el) el.textContent = formattedText;
+  }
+  handleOnTimeUpdate(data) {
+    // console.log("currentTime", this.#data.audio.currentTime);
+    //fire trigger for control
+    if (this.#data.pauseOnTimeUpdate) return;
+
+    const event = trackIsPlaying(
+      this.#data.player_key,
+      this.#data.audio.currentTime,
+      this.#data.audio.duration
+    );
+    if (event) {
+      document.dispatchEvent(event);
+    }
   }
 }
 
