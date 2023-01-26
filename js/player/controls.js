@@ -5,28 +5,35 @@ const template = document.createElement("template");
 template.innerHTML = `
   <style>
   :host {
-    background-color: var(--controls-background-color);
+    // background-color: var(--controls-background-color);
+    background-color: orangered;
+    border-radius: 0.50rem;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
   }
   
   .container {
+    text-align: center;
+  }
+
+  .control__container{
     display: flex;
     flex-direction: column;
     text-align: center;
     align-items: center;
     justify-content: center;
+    
   }
+
+
   
   .progress_bar {
-    grid-column: 1 / 3;
-    grid-row: 1/ 2;
     width: 100%;
     height: var(--progress-height);
-    background-color: var(--progress-background-color);
-  
-    position: relative;
-    // border: 1px solid gray;
+
+
     overflow: hidden;
-    // border-radius: 100px;
   }
   
   .background {
@@ -49,7 +56,7 @@ template.innerHTML = `
     top: 0;
   }
   .control__container {
-    grid-column: 1 / -1;
+    grid-column: 1 / 2;
     grid-row: 2/ 3;
     text-align: center;
     // margin-right: 0;
@@ -105,60 +112,58 @@ template.innerHTML = `
     width: auto;
   }
 
-  .volume{
-    align-self: flex-start;
-    margin-right: 2rem;
-
+  .progress{
+    width: 100%;
   }
+
+
 
   </style>
 
   <div id="container" class="container">
 
-    <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
+  <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
 
   <div id="control__container" class="control__container">
 
-    <span
-      class="material-symbols-outlined player-control-icon center"
-      title="Previous track"
-      id="skip_previous"
-    >
-      skip_previous
-    </span>
+          <span
+            class="material-symbols-outlined player-control-icon center"
+            title="Previous track"
+            id="skip_previous"
+          >
+            skip_previous
+          </span>
 
-    <span class="material-symbols-outlined player-control-icon center"   id="play_track">
-      play_circle
-    </span>
+          <span class="material-symbols-outlined player-control-icon center"   id="play_track">
+            play_circle
+          </span>
 
-    <span class="material-symbols-outlined player-control-icon hide"  id="pause_track">
-      pause_circle
-    </span>
+          <span class="material-symbols-outlined player-control-icon hide"  id="pause_track">
+            pause_circle
+          </span>
 
-    <span class="material-symbols-outlined player-control-icon" id="skip_next">
-      skip_next
-    </span>
+          <span class="material-symbols-outlined player-control-icon" id="skip_next">
+            skip_next
+          </span>
 
-    <slot name="shuffle">
-      <span class="material-symbols-outlined player-control-icon "
-      id="shuffle">shuffle</span
-      >
-      <span class="material-symbols-outlined player-control-icon hide"
-      id="repeat">repeat</span
-      >
-      <span class="material-symbols-outlined player-control-icon hide"
-      id="repeat_one">repeat_one</span
-      >
-    </slot>
+          <slot name="shuffle">
+            <span class="material-symbols-outlined player-control-icon "
+            id="shuffle">shuffle</span
+            >
+            <span class="material-symbols-outlined player-control-icon hide"
+            id="repeat">repeat</span
+            >
+            <span class="material-symbols-outlined player-control-icon hide"
+            id="repeat_one">repeat_one</span
+            >
+          </slot>
   </div>
 
   <ulut0002-volume class="volume"></ulut0002-volume>
 
-  <div id="timer" class="timer">
-    <span class="current">1:12/</span>
-    <span class="total">3:46</span>
-  </div>
+
 </div>
+
 
 `;
 

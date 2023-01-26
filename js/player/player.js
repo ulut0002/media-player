@@ -11,16 +11,10 @@ const template = document.createElement("template");
 template.innerHTML = `
   <style>
     .container {
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows:
-        minmax(min-content, max-content)
-        minmax(min-content, max-content)
-        1fr
-        minmax(min-content, max-content);
+      display: flex;
+      flex-direction: column;
+
       background-color: var(--background-color);
-      
-      
       color: var(--font-color);
       padding: 0;
       margin: 0;
@@ -28,9 +22,6 @@ template.innerHTML = `
 
     
     .header {
-      grid-column: 1 / 2;
-      grid-row: 1 / 2;
-      border: none;
       padding: 0;
       margin: 0;
       background-color: var(--header-main-bg);
@@ -38,25 +29,29 @@ template.innerHTML = `
     }
     
     .preview {
+      
+      flex: 1;
 
-      grid-column: 1 / 2;
-      grid-row: 2 / 3;
       padding: 0;
       margin: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      background: var(--preview-background);
+      background-image: var(--preview-background-gradient);
+    
     }
     
     .playlist {
       grid-column: 1 / 2;
       grid-row: 4 / 5;
-
       background-color: green;
+
+  
     }
     
-    .controls {
-      grid-column: 1 / 2;
-      grid-row: 3 / 4;
-      background-color: blue;
-    }
+
     
     @media only screen and (min-width: 45rem) {
       .container {
@@ -82,6 +77,8 @@ template.innerHTML = `
       .preview {
         grid-column: 1 / 2;
         grid-row: 2 / 3;
+        display: flex;
+        flex-direction: column;
       }
     
       .playlist {
@@ -91,12 +88,7 @@ template.innerHTML = `
 
       }
     
-      .controls {
-        grid-column: 1 / 2;
-        grid-row: 3 / 4;
-    
-        background-color: blue;
-      }
+
     }
     
       
@@ -104,22 +96,19 @@ template.innerHTML = `
   
 
   <div id="player" class="container">
-        <div id="header" class="header">
-          <ulut0002-header >
-            <h1 slot="title">Serdar's Mix Playlist</h1>
-          </ulut0002-header>
-        </div>
+  <div id="header" class="header">
+    <ulut0002-header>
+      <h1 slot="title">Serdar's Mix Playlist</h1>
+    </ulut0002-header>
+  </div>
 
-        <div id="preview" class="preview">
-          <ulut0002-preview>
-          </ulut002-preview>
-        </div> 
-        
-        <div id="playlist" class="playlist"></div>
-        <ulut0002-controls id="controls"></ulut0002-controls>
+  <div id="preview" class="preview">
+    <ulut0002-preview></ulut0002-preview>
+  </div>
 
-        
-    </div>
+  <div id="playlist" class="playlist"></div>
+</div>
+
 
 
 
@@ -127,6 +116,12 @@ template.innerHTML = `
 
     
 `;
+
+// old code
+// <div id="preview" class="preview">
+// <ulut0002-preview></ulut0002-preview>
+//  <ulut0002-controls id=""></ulut0002-controls>
+// </div>
 
 class Player extends HTMLElement {
   #player_key = null;
@@ -158,7 +153,6 @@ class Player extends HTMLElement {
     this.#playerDiv = this.root.getElementById("player");
     this.#playlistDiv = this.root.getElementById("playlist");
     this.#headerDiv = this.root.getElementById("header");
-    this.#controlDiv = this.root.getElementById("controls");
 
     this.#previewDiv = this.root
       .getElementById("preview")
@@ -254,7 +248,6 @@ class Player extends HTMLElement {
         //set player_key for all sub-elements
         trackEl.setAttribute("player_key", this.player_key);
         this.#previewDiv.setAttribute("player_key", this.player_key);
-        this.#controlDiv.setAttribute("player_key", this.player_key);
 
         this.#playlistDiv.append(trackEl);
       });

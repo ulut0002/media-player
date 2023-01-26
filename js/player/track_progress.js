@@ -9,6 +9,8 @@ import {
   enableDisableTrackTime,
 } from "./player-event.js";
 
+import { convertSecondsToHMSString } from "./util.js";
+
 const template = document.createElement("template");
 template.innerHTML = `
 
@@ -57,11 +59,28 @@ template.innerHTML = `
   width: 1px; 
 } 
 
+.played_time{
+  flex: 0;
+  padding: 0 0.25rem;
+}
+
+.remaining_time{
+  flex: 0;
+  padding: 0 0.25rem;
+
+}
+
+.progress{
+  flex: 1;
+  width: 100%;
+}
+
+
 </style>
 
   <div id="container" class="container">
       <div id="played_time" class="played_time"></div>
-      <input type="range" id="progress" class="progress" name="volume" min="0" max="100" step="1" >
+      <input type="range" id="progress" class="progress" name="volume" min="0" max="100" value="0" step="1" >
       <div id="remaining_time" class="remaining_time"></div>
   </div>    
 `;
@@ -136,9 +155,12 @@ class TrackProgress extends HTMLElement {
               if (this.#data.range && ev.detail.percentage) {
                 this.#data.range.value = ev.detail.percentage;
               }
-              this.#data.remainingTime.textContent =
-                ev.detail.duration - ev.detail.currentPosition;
-              this.#data.playedTime.textContent = ev.detail.currentPosition;
+              this.#data.remainingTime.textContent = convertSecondsToHMSString(
+                ev.detail.duration - ev.detail.currentPosition
+              );
+              this.#data.playedTime.textContent = convertSecondsToHMSString(
+                ev.detail.currentPosition
+              );
             }
           );
 

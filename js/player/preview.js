@@ -1,38 +1,38 @@
+import Controls from "./controls.js";
+
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-    :host{}
+    :host{
+      display: block;
+      background-color: cyan;
+      height: 100%;
+
+    }
 
     .container{
       display: flex;
-      flex-direction: column;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 2rem;
       height: 100%;
-      align-items: center;
-      background: var(--preview-background);
-      background-image: var(--preview-background-gradient);
+
+
+      background: inherit;
+      background-image: inherit;
     }
 
 
-    .container2{
-        margin: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        // gap: 1rem;
-    }
+ 
 
-    img{
+    img, .artwork{
+        margin-top: auto; /*Do not remove by mistake*/
         max-width: 100%;
         height: auto;
         width: auto;
-        flex: 1;
         border-radius: 1rem;
-        // margin-top: 2rem;
-        // margin-bottom: 2rem;
-        
-        
+        align-self: center !important;
     }
 
 
@@ -41,14 +41,19 @@ template.innerHTML = `
   
     }
 
+    /* from: https://github.com/WICG/webcomponents/issues/795 */
+    slot[name=image]::slotted(*){
+      align-self: center !important;
+    }
+
     #artist_name, #track_name{
       font-weight: bold;
       font-size: 2rem;
+      align-self: center !important;
     
     }
 
     #track_name{
-      align-self: flex-start;
       font-size: var(--preview-track-size);
       margin-top: 1rem;
       margin-bottom: 0.25rem;
@@ -58,12 +63,19 @@ template.innerHTML = `
     }
 
     #artist_name{
-      align-self: flex-end;
       font-size: var(--preview-artist-size);
       margin-top: 0.25rem;
       color:var(--preview-artist-color);
       margin-right: 0.75rem;
 
+    }
+
+
+
+    .controls{
+      margin-top: auto;
+      max-width: 100%;
+      width: 100%;
     }
 
 
@@ -353,23 +365,22 @@ template.innerHTML = `
           opacity: 1;
         }
       }
+
+
       
 
   </style>
   
   <div id="container" class="container">
-    <div class="container2">
-    <div id="track_name" class="bounce-top">
-    </div>
-        <slot name="image">
-
-          
-          <img class="swirl-in-fwd artwork" id="artwork" src="./img/preview-placeholder.png" alt="A music record without a label">
+        <div id="track_name" class="bounce-top"></div>
+        <slot name="image" class="artwork">
+          <img class="swirl-in-fwd artwork img" id="artwork" src="./img/preview-placeholder.png" alt="A music record without a label">
         </slot>
         <div id="artist_name" class="bounce-bottom"></div>
+        <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
 
     </div>
-  </div>
+
 
 `;
 
@@ -381,6 +392,7 @@ class Preview extends HTMLElement {
   #image = null;
   #artistNameDiv = null;
   #trackNameDiv = null;
+  #controlDiv = null;
 
   constructor() {
     super();
@@ -404,6 +416,7 @@ class Preview extends HTMLElement {
     this.#image = this.root.getElementById("artwork");
     this.#artistNameDiv = this.root.getElementById("artist_name");
     this.#trackNameDiv = this.root.getElementById("track_name");
+    this.#controlDiv = this.root.getElementById("controls");
   }
 
   static get observedAttributes() {
@@ -425,6 +438,7 @@ class Preview extends HTMLElement {
       switch (attrName) {
         case "player_key":
           this.#data.player_key = newVal;
+          this.#controlDiv.setAttribute("player_key", this.player_key);
           break;
       }
     }
@@ -476,6 +490,7 @@ class Preview extends HTMLElement {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
+    this.#controlDiv.setAttribute("player_key", this.player_key);
   }
 }
 
