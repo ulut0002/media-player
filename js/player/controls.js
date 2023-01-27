@@ -4,164 +4,96 @@ import TrackProgress from "./track_progress.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-  :host {
-    // background-color: var(--controls-background-color);
-    background-color: orangered;
-    border-radius: 0.50rem;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    :host {
+       background-color: var(--controls-background-color);
 
-  }
-  
-  .container {
-    text-align: center;
-  }
-
-  .control__container{
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
+      border-top-right-radius: 0.40rem;
+      border-top-left-radius: 0.40rem;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
     
-  }
-
-
-  
-  .progress_bar {
-    width: 100%;
-    height: var(--progress-height);
-
-
-    overflow: hidden;
-  }
-  
-  .background {
-    background-color: goldenrod;
-    background-color: var(--progress-background-color);
-    width: 100%;
-    height: var(--progress-height);
-    left: 0;
-    top: 0;
-    position: absolute;
-  }
-  
-  .ticker {
-    position: absolute;
-    background-color: var(--progress-color);
-  
-    width: 22%;
-    height: var(--progress-height);
-    left: 0;
-    top: 0;
-  }
-  .control__container {
-    grid-column: 1 / 2;
-    grid-row: 2/ 3;
-    text-align: center;
-    // margin-right: 0;
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
     
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    justify-content: flex-start;
-    margin: 0.25rem 0;
-  }
+    .progress {
+      width: 100%;
+      margin-top: 0.55rem;
+    }
 
-  .end{
-    align-self: flex-end;
-  }
-  
-  .player-control-icon {
-    display: inline-block !important;
-    font-size: var(--control-icon-size) !important;
-    color: var(--controls-color) !important;
-    cursor: pointer;
-  }
-  
-  .player-control-icon:hover {
-    color: var(--controls-hover-color) !important;
-    transform: scale(var(--controls-hover-scale));
-  }
-  
-  .timer {
-    grid-column: 2 / 3;
-    grid-row: 2/ 3;
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    bottom: 50%;
-    font-size: var(--font-xs);
-    color: var(--controls-color) !important;
-    display: flex;
-    justify-content: center;
+    .control__container {
+      display: flex;
+      flex-direction: row;
+      gap: 0.25rem;
+      align-items: center;
+      margin: 0.75rem 0;
+    }
 
-    align-items: center;
+    .volume{
+      width: min(50%, 45rem);
+      // border: 5px solid green;
+      margin-bottom: 0.55rem;
+     
+    }
+
+        
+    .player-control-icon {
+      display: inline-block !important;
+      font-size: var(--control-icon-size) !important;
+      color: var(--controls-color) !important;
+      cursor: pointer;
+    }
     
-  }
-  
+    .player-control-icon:hover {
+      color: var(--controls-hover-color) !important;
+      transform: scale(var(--controls-hover-scale));
+    }
 
-  
-  .hide {
-    display: none !important;
-  }
-  
-  slot[name="image"]::slotted(*) {
-    max-width: 100%;
-    height: auto;
-    width: auto;
-  }
+    .hide {
+      display: none !important;
+    }
+    
 
-  .progress{
-    width: 100%;
-  }
+    
+  
+  
 
 
 
   </style>
 
   <div id="container" class="container">
+    <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
 
-  <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
+    <div id="control__container" class="control__container">
+      <span class="material-symbols-outlined player-control-icon center" title="Previous track" id="skip_previous">
+        skip_previous
+      </span>
 
-  <div id="control__container" class="control__container">
+      <span class="material-symbols-outlined player-control-icon center" id="play_track">
+        play_circle
+      </span>
 
-          <span
-            class="material-symbols-outlined player-control-icon center"
-            title="Previous track"
-            id="skip_previous"
-          >
-            skip_previous
-          </span>
+      <span class="material-symbols-outlined player-control-icon hide" id="pause_track">
+        pause_circle
+      </span>
 
-          <span class="material-symbols-outlined player-control-icon center"   id="play_track">
-            play_circle
-          </span>
+      <span class="material-symbols-outlined player-control-icon" id="skip_next">
+        skip_next
+      </span>
 
-          <span class="material-symbols-outlined player-control-icon hide"  id="pause_track">
-            pause_circle
-          </span>
+      <slot name="shuffle">
+        <span class="material-symbols-outlined player-control-icon" id="shuffle">shuffle</span>
+        <span class="material-symbols-outlined player-control-icon hide" id="repeat">repeat</span>
+        <span class="material-symbols-outlined player-control-icon hide" id="repeat_one">repeat_one</span>
+      </slot>
+    </div>
 
-          <span class="material-symbols-outlined player-control-icon" id="skip_next">
-            skip_next
-          </span>
-
-          <slot name="shuffle">
-            <span class="material-symbols-outlined player-control-icon "
-            id="shuffle">shuffle</span
-            >
-            <span class="material-symbols-outlined player-control-icon hide"
-            id="repeat">repeat</span
-            >
-            <span class="material-symbols-outlined player-control-icon hide"
-            id="repeat_one">repeat_one</span
-            >
-          </slot>
-  </div>
-
-  <ulut0002-volume class="volume"></ulut0002-volume>
-
-
+    <ulut0002-volume class="volume"></ulut0002-volume>
 </div>
 
 
@@ -208,7 +140,6 @@ class Controls extends HTMLElement {
   }
 
   handleClick(ev) {
-    console.log("clicked ", ev.target.id);
     const id = ev.target.id.toLowerCase();
     switch (id) {
       case "play_track":

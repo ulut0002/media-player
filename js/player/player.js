@@ -10,104 +10,101 @@ import { generateRandomString } from "./util.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-    .container {
-      display: flex;
-      flex-direction: column;
 
-      background-color: var(--background-color);
-      color: var(--font-color);
-      padding: 0;
-      margin: 0;
-    }
-
-    
-    .header {
-      padding: 0;
-      margin: 0;
-      background-color: var(--header-main-bg);
-      background-image:  var(--header-background-gradient);
-    }
-    
-    .preview {
+      :host {
+        display: block;
+      }
       
-      flex: 1;
-
-      padding: 0;
-      margin: 0;
-
-      display: flex;
-      flex-direction: column;
-
-      background: var(--preview-background);
-      background-image: var(--preview-background-gradient);
-    
-    }
-    
-    .playlist {
-      grid-column: 1 / 2;
-      grid-row: 4 / 5;
-      background-color: green;
-
-  
-    }
-    
-
-    
-    @media only screen and (min-width: 45rem) {
       .container {
-        display: grid;
-        grid-template-columns: minmax(min-content, max-content) minmax(
-            20rem,
-            max-content
-          );
-    
-        grid-template-columns: auto minmax(20rem, max-content);
-    
-        grid-template-rows:
-          minmax(min-content, max-content)
-          1fr
-          minmax(min-content, max-content);
+        display: flex;
+        flex-direction: column;
+        background-color: var(--background-color);
+        color: var(--font-color);
+        padding: 0;
+        margin: 0;
       }
-    
+      
       .header {
-        grid-column: 1 / 3;
-        grid-row: 1 / 2;
+        padding: 0;
+        margin: 0;
+        background-color: var(--header-main-bg);
+        background-image: var(--header-background-gradient);
       }
-    
+      
       .preview {
+        padding: 0;
+        margin: 0;
+      
+        display: flex;
+        flex-direction: column;
+      
+        background: var(--preview-background);
+        background-image: var(--preview-background-gradient);
+      }
+      
+      .playlist {
         grid-column: 1 / 2;
-        grid-row: 2 / 3;
+        grid-row: 4 / 5;
+        background-color: green;
+        
         display: flex;
         flex-direction: column;
       }
-    
-      .playlist {
-        grid-column: 2 / 3;
-        grid-row: 2 / 4;
-        background-color: green;
-
+      
+      @media only screen and (min-width: 45rem) {
+        .container {
+          display: grid;
+          grid-template-columns:
+            minmax(min-content, max-content)
+            minmax(20rem, max-content);
+      
+          grid-template-columns: auto minmax(20rem, max-content);
+          grid-template-columns: 1fr auto;
+      
+          grid-template-rows:
+            minmax(min-content, max-content)
+            1fr
+            minmax(min-content, max-content);
+        }
+      
+        .header {
+          grid-column: 1 / 3;
+          grid-row: 1 / 2;
+        }
+      
+        .preview {
+          grid-column: 1 / 2;
+          grid-row: 2 / 3;
+          display: flex;
+          flex-direction: column;
+        }
+      
+        .playlist {
+          grid-column: 2 / 3;
+          grid-row: 2 / 4;
+          background-color: green;
+        }
       }
-    
-
-    }
+      
     
       
   </style>
   
 
-  <div id="player" class="container">
-  <div id="header" class="header">
-    <ulut0002-header>
-      <h1 slot="title">Serdar's Mix Playlist</h1>
-    </ulut0002-header>
-  </div>
+    <div id="player" class="container">
+      <div id="header" class="header">
+        <ulut0002-header>
+          <h1 slot="title">Serdar's Mix Playlist</h1>
+        </ulut0002-header>
+      </div>
 
-  <div id="preview" class="preview">
-    <ulut0002-preview></ulut0002-preview>
-  </div>
+      <div id="preview" class="preview">
+        <ulut0002-preview></ulut0002-preview>
+      </div>
 
-  <div id="playlist" class="playlist"></div>
-</div>
+      <div id="playlist" class="playlist"></div>
+    </div>
+
 
 
 
@@ -208,13 +205,7 @@ class Player extends HTMLElement {
   }
 
   buildPlayer() {
-    //add the unique id to the root
-    //each child component (playlist, control buttons etc) will find this with closest() attribute
-    //this.setAttribute("instance-id", this.#instanceID);
-
-    //create header
-    if (this.#headerDiv) {
-    }
+    this.#previewDiv.setAttribute("player_key", this.player_key);
 
     //add tracks to the playlist
     if (this.#playlistDiv) {
@@ -224,31 +215,27 @@ class Player extends HTMLElement {
         let subElement = document.createElement("img");
         subElement.slot = "image";
         subElement.src = this.imagePath + track.thumbnail;
-        subElement.alt = `Album art of the song ${track.name} by ${track.artist}`;
+        subElement.alt = `Album artwork (small) of track ${track.name} by ${track.artist}`;
         trackEl.append(subElement);
 
         subElement = document.createElement("span");
         subElement.slot = "title";
+        subElement.title = `Track: ${track.name}`;
         subElement.innerHTML = track.name;
         trackEl.append(subElement);
 
         subElement = document.createElement("span");
         subElement.slot = "artist";
+        subElement.title = `Artist: ${track.artist}`;
         subElement.innerHTML = track.artist;
         trackEl.append(subElement);
 
         const path = this.#mediaPath + track.file;
-        // const path1 = new URL("util.js").pathname;
-        // console.log(path1);
-        // console.log("track path", path);
         trackEl.setAttribute("file", path);
         trackEl.setAttribute("thumbnail", this.#imagePath + track.thumbnail);
         trackEl.setAttribute("image", this.#imagePath + track.art_cover);
 
-        //set player_key for all sub-elements
         trackEl.setAttribute("player_key", this.player_key);
-        this.#previewDiv.setAttribute("player_key", this.player_key);
-
         this.#playlistDiv.append(trackEl);
       });
     }
@@ -266,7 +253,7 @@ class Player extends HTMLElement {
             this.#mediaPath = parsedData.mediaPath;
           } catch (error) {
             //display an error
-            console.log("tracks cannot be read");
+            // console.log("tracks cannot be read");
           }
           break;
 

@@ -1,51 +1,55 @@
 const template = document.createElement("template");
 template.innerHTML = `
+  <style>
 
+    @import url("./style/player.css");
 
-<style>
+    :host {
+      display: block;
+    }
 
-:host{
-  display: block;
-}
+    .container {
+      display: flex;
+      gap: 0.25rem;
+    }
 
-.container{
-  display: flex;
-  gap: 0.25rem;
-}
-.player-control-icon {
-  display: inline-block !important;
-  font-size: var(--control-icon-size) !important;
-  color: var(--controls-color) !important;
-  cursor: pointer;
-}
+    .volume{
+      flex: 1;
+    }
+    
+    .player-control-icon {
+      display: inline-block !important;
+      font-size: var(--control-icon-size-small) !important;
+      color: var(--controls-color) !important;
+      cursor: pointer;
+    }
 
-.player-control-icon:hover {
-  color: var(--controls-hover-color) !important;
-  transform: scale(var(--controls-hover-scale));
-}
+    .player-control-icon:hover {
+      color: var(--controls-hover-color) !important;
+      transform: scale(var(--controls-hover-scale));
+    }
 
-.hide{
-  display: none !important;
-}
+    .hide {
+      display: none !important;
+    }
 
-.volume{
-  cursor: pointer;
-}
+    .volume {
+      cursor: pointer;
+    }
 
+    .hide-element {
+      border: 0;
+      clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+      clip: rect(1px, 1px, 1px, 1px);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
 
-.hide-element {
-  border: 0;
-  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-  clip; rect(1px, 1px, 1px, 1px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px; 
-} 
-
-</style>
+  </style>
 
   <div id="container" class="container">
       <span class="material-symbols-outlined player-control-icon" id="volume_off">volume_off</span>
@@ -57,52 +61,61 @@ template.innerHTML = `
 `;
 
 class VolumeSlider extends HTMLElement {
+  static DEFAULT_VOLUME = 70;
+  static #VOLUME_STORAGE_KEY = `ulut0002-player-volume`;
+
+  //stores component data
   #data = {
     currentVolume: 0,
-    lastVolume: 0,
+    lastVolume: 0, // Used to set the volume back to original when unmute action happens
   };
+
+  //stores dom elements
+  #dom = {};
+
   constructor() {
     super();
     this.root = this.attachShadow({ mode: "closed" });
     this.root.append(template.content.cloneNode(true));
 
-    let link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "../style/player.css";
-    this.root.appendChild(link);
+    // read dom elements
+    this.#dom.volumeOffEl = this.root.getElementById("volume_off");
+    this.#dom.volumeDownEl = this.root.getElementById("volume_down");
+    this.#dom.volumeUpEl = this.root.getElementById("volume_up");
+    this.#dom.range = this.root.getElementById("volume");
 
-    link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0";
-    this.root.appendChild(link);
+    /*
+    //Disabled for usability. Each window can have its own sound setting
+    window.addEventListener("storage", (ev) =>
+      this.handleStorageChange.call(this, ev)
+    );
+    */
 
-    this.#data.volumeOffEl = this.root.getElementById("volume_off");
-    this.#data.volumeDownEl = this.root.getElementById("volume_down");
-    this.#data.volumeUpEl = this.root.getElementById("volume_up");
-    this.#data.range = this.root.getElementById("volume");
-
-    this.#data.volumeOffEl.addEventListener(
+    // Click "volume-off" icon is clicked ->  system turns the volume on (knowing it was already muted)
+    this.#dom.volumeOffEl.addEventListener(
       "click",
       this.turnVolumeOn.bind(this)
     );
 
-    this.#data.volumeDownEl.addEventListener(
+    // When "volume-down" is clicked, sound is turned off
+    this.#dom.volumeDownEl.addEventListener(
       "click",
       this.turnVolumeOff.bind(this)
     );
 
-    this.#data.volumeUpEl.addEventListener(
+    // When "volume-up" is clicked, sound is turned off
+    this.#dom.volumeUpEl.addEventListener(
       "click",
       this.turnVolumeOff.bind(this)
     );
 
-    this.#data.range.addEventListener(
-      "input",
-      this.handleRangeInput.bind(this)
-    );
+    // When user starts changing range values, an event is sent to the playing track to change the volume
+    this.#dom.range.addEventListener("input", this.handleRangeInput.bind(this));
 
-    this.#data.range.addEventListener(
+    // When user submits the volume setting:
+    // 1: an event is sent to the playing track to change the volume
+    // 2: The setting is saved in local storage
+    this.#dom.range.addEventListener(
       "change",
       this.handleRangeChange.bind(this)
     );
@@ -120,67 +133,95 @@ class VolumeSlider extends HTMLElement {
     this.setAttribute("volume", value);
   }
 
-  connectedCallback() {
-    if (!this.#data.currentVolume) {
-      this.#data.currentVolume = 0;
+  async handleStorageChange(ev) {
+    return;
+    if (!ev && !ev.key) return;
+    switch (ev.key) {
+      case VolumeSlider.#VOLUME_STORAGE_KEY:
+        let newValue = parseInt(JSON.parse(ev.newValue));
+        //No need for this. Each window can have its own volume
+        //await this.setVolume(newValue);
+
+        break;
     }
-    this.updateCurrentVolume();
   }
 
-  turnVolumeOn(ev) {
+  async setVolume(value) {
+    value =
+      isNaN(value) || value < 0 || value > 100
+        ? VolumeSlider.DEFAULT_VOLUME
+        : value;
+    this.#data.currentVolume = value;
+    this.#dom.range.value = value;
+    await this.displayCurrentVolumeUI(this.#data.currentVolume);
+    await this.fireVolumeChangeEvent();
+  }
+
+  connectedCallback() {
+    this.readCurrentVolume();
+  }
+
+  async readCurrentVolume() {
+    if (this.volume) {
+      this.#data.currentVolume = this.volume;
+    }
+
+    const volumeObj = localStorage.getItem(VolumeSlider.#VOLUME_STORAGE_KEY);
+    if (volumeObj) {
+      const volume = JSON.parse(volumeObj);
+      this.#data.currentVolume = volume;
+    }
+    await this.setVolume(this.#data.currentVolume);
+  }
+
+  async turnVolumeOn(ev) {
     this.#data.currentVolume = this.#data.lastVolume;
-    this.updateCurrentVolume();
-    this.fireVolumeChangeEvent();
-    this.displayCurrentVolume(this.#data.currentVolume);
+    await this.setVolume(this.#data.currentVolume);
   }
 
-  turnVolumeOff(ev) {
+  async turnVolumeOff(ev) {
     this.#data.currentVolume = 0;
-    this.updateCurrentVolume();
-    this.fireVolumeChangeEvent();
-    this.displayCurrentVolume(this.#data.currentVolume);
+    await this.setVolume(this.#data.currentVolume);
   }
 
-  updateCurrentVolume() {
-    this.#data.range.value = this.#data.currentVolume;
-  }
-
-  handleRangeInput(ev) {
-    // Note: The input event is fired every time the value of the element changes.
+  // "input" event is fired every time the value of the element changes.
+  async handleRangeInput(ev) {
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
-    this.displayCurrentVolume(i);
+    await this.displayCurrentVolumeUI(i);
   }
 
-  handleRangeChange(ev) {
-    // This is unlike the change event, which only fires when the value is committed, such as by pressing the enter key, selecting a value from a list of options, and the like.
+  // This is fired when user actually submits the new value
+  async handleRangeChange(ev) {
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
     if (i > 0) {
-      //this is the last non-zero volume. so keep it in memory
+      // this is the most recent value for non-zero volume.
+      // It is used to set the volume back when user unmutes
       this.#data.lastVolume = i;
     }
+    localStorage.setItem(VolumeSlider.#VOLUME_STORAGE_KEY, JSON.stringify(i));
+    await this.fireVolumeChangeEvent();
   }
 
-  displayCurrentVolume(i) {
+  async displayCurrentVolumeUI(i) {
     if (i === 0) {
-      this.#data.volumeOffEl.classList.remove("hide");
-      this.#data.volumeDownEl.classList.add("hide");
-      this.#data.volumeUpEl.classList.add("hide");
+      this.#dom.volumeOffEl.classList.remove("hide");
+      this.#dom.volumeDownEl.classList.add("hide");
+      this.#dom.volumeUpEl.classList.add("hide");
     } else if (i < 50) {
-      this.#data.volumeOffEl.classList.add("hide");
-      this.#data.volumeDownEl.classList.remove("hide");
-      this.#data.volumeUpEl.classList.add("hide");
+      this.#dom.volumeOffEl.classList.add("hide");
+      this.#dom.volumeDownEl.classList.remove("hide");
+      this.#dom.volumeUpEl.classList.add("hide");
     } else {
-      this.#data.volumeOffEl.classList.add("hide");
-      this.#data.volumeDownEl.classList.add("hide");
-      this.#data.volumeUpEl.classList.remove("hide");
+      this.#dom.volumeOffEl.classList.add("hide");
+      this.#dom.volumeDownEl.classList.add("hide");
+      this.#dom.volumeUpEl.classList.remove("hide");
     }
   }
 
-  fireVolumeChangeEvent() {
-    //this fires a custom event to the document to adjust volume level of each audio object
-    //it also fires another event so that Player object can save the current volume to local database
+  async fireVolumeChangeEvent() {
+    //TODO: Dispatch a windows event so that tracks can be notified about the volume change.
   }
 }
 

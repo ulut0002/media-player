@@ -1,9 +1,21 @@
 /**
- *
- * Triggers:
- * range.change event: fire an event ('seek_position',player_key) -> this will affect the current song only
- *
+
+Component Behaviour:
+
+# User can change progress only if there is a track that's actually playing. 
+
+# When user changes position, an event is dispatched. ('seek_position',player_key).
+This event will be handled by the currently playing track. The track event will receive a percentage value, and seek proper position in the audio object 
+
+# The moment user starts moving the range, an event is dispatched to the track. This event will make sure the track won't be sending current miliseconds of the audio object back to this component. (For UX purpose)
+
+
+# Listens to 'track-is-playing' event. This event is fired by the track component every second. The component updates the remaining time, and played time in the component. 
+
+
+
  */
+
 import {
   trackPositionChanged,
   enableDisableTrackTime,
@@ -13,75 +25,70 @@ import { convertSecondsToHMSString } from "./util.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
+  <style>
+    :host {
+      display: block;
+    }
 
+    .container {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+    }
 
-<style>
+    .player-control-icon {
+      display: inline-block !important;
+      font-size: var(--control-icon-size) !important;
+      color: var(--controls-color) !important;
+      cursor: pointer;
+    }
 
-:host{
-  display: block;
-}
+    .player-control-icon:hover {
+      color: var(--controls-hover-color) !important;
+      transform: scale(var(--controls-hover-scale));
+    }
 
-.container{
-  display: flex;
-  gap: 0.25rem;
-}
+    .hide {
+      display: none !important;
+    }
 
-.player-control-icon {
-  display: inline-block !important;
-  font-size: var(--control-icon-size) !important;
-  color: var(--controls-color) !important;
-  cursor: pointer;
-}
+    .hide-element {
+      border: 0 !important;
+      clip: rect(1px 1px 1px 1px) !important; /* IE6, IE7 */
+      clip: rect(1px, 1px, 1px, 1px) !important;
+      height: 1px !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      position: absolute !important;
+      width: 1px !important;
+    }
+    
+    .played_time {
+      flex:0;
+      padding: 0 0.25rem;
+    }
 
-.player-control-icon:hover {
-  color: var(--controls-hover-color) !important;
-  transform: scale(var(--controls-hover-scale));
-}
+    .remaining_time {
+      flex: 0;
+      padding: 0 0.25rem;
+    }
 
-.hide{
-  display: none !important;
-}
+    .progress {
+      flex: 1;
+    }
 
-.volume{
-  cursor: pointer;
-}
+    .text{
+      color: var(--controls-color);
+      font-size: var(--font-xs);
+    }
 
-
-.hide-element {
-  border: 0;
-  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-  clip; rect(1px, 1px, 1px, 1px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px; 
-} 
-
-.played_time{
-  flex: 0;
-  padding: 0 0.25rem;
-}
-
-.remaining_time{
-  flex: 0;
-  padding: 0 0.25rem;
-
-}
-
-.progress{
-  flex: 1;
-  width: 100%;
-}
-
-
-</style>
+  </style>
 
   <div id="container" class="container">
-      <div id="played_time" class="played_time"></div>
+      <div id="played_time" class="text played_time"></div>
       <input type="range" id="progress" class="progress" name="volume" min="0" max="100" value="0" step="1" >
-      <div id="remaining_time" class="remaining_time"></div>
+      <div id="remaining_time" class="text remaining_time"></div>
   </div>    
 `;
 
@@ -93,6 +100,7 @@ class TrackProgress extends HTMLElement {
     range: null,
     playedTime: null,
     remainingTime: null,
+    playing: null,
   };
 
   constructor() {
@@ -182,6 +190,14 @@ class TrackProgress extends HTMLElement {
 
   handleRangeChange(ev) {
     // This is unlike the change event, which only fires when the value is committed, such as by pressing the enter key, selecting a value from a list of options, and the like.
+
+    //if no song is playing, then prevent range change. No need.
+    if (!this.#data.playing) {
+      this.#data.currentPosition = 0;
+      this.#data.range.value = 0;
+      return;
+    }
+
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
     // console.log("track is ", i);

@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,400;0,700;1,400;1,700&family=Itim&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
 /* Box sizing rules */
 *,
 *::before,
@@ -129,7 +129,8 @@ by R Min Max
   --font-small: 0.889rem;
   --font-xs: 0.75rem;
   --note-size: 1.3rem;
-  --control-icon-size: 2.4rem;
+  --control-icon-size: 2.9rem;
+  --control-icon-size-small: 2rem;
 
   --header-font-color: hsl(8, 69%, 28%);
   --header-font-color-hover: hsl(8, 69%, 58%);
@@ -206,11 +207,12 @@ by R Min Max
   --preview-track-color: #210c36;
   --preview-artist-color: #dbd9de;
   --preview-artist-size: var(--font-h6);
+  --preview-image-border-radius: 0.33rem;
   /* end of preview section */
 
   /* control section */
   --progress-background-color: #aca1b0;
-  --progress-height: 0.55rem;
+
   --progress-color: #fae24c;
   --progress-button-color: "";
   --progress-button-size: "";
@@ -224,6 +226,11 @@ by R Min Max
   /* end of control section */
 
   /* track styling */
+
+  --track-bg-color: ghostwhite;
+  --track-border-bottom: 0.0625rem solid rgb(225, 223, 223);
+  --track-hover-color: #f9f0b2;
+
   --track-bg-color-2: #fbf8f9;
   --track-bg-color-1: #ffc3d7;
   --track-hover-bg-color-2: #fbf8f9;
@@ -288,7 +295,8 @@ div {
     --font-h5: 1.2rem;
     --font-small: 0.833rem;
     --note-size: 2rem;
-    --control-icon-size: 2.9rem;
+    --control-icon-size: 3.4rem;
+    --control-icon-size-small: 2.5rem;
   }
 }
 
@@ -302,6 +310,7 @@ div {
     --font-h5: 1.25rem;
     --font-small: 0.8rem;
     --note-size: 3rem;
-    --control-icon-size: 3.3rem;
+    --control-icon-size: 3.89rem;
+    --control-icon-size-small: 2.9rem;
   }
 }

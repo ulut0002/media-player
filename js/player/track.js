@@ -12,16 +12,16 @@ template.innerHTML = `
     }
 
     .track{
-        background-color: var(--bg-color);
+        background-color: var(--track-bg-color);
         cursor: pointer;
         display: grid;
         grid-template-columns: auto 1fr auto;
         grid-template-rows: minmax(min-content, max-content);
-
+        border-bottom: var(--track-border-bottom);
     }
     
     .track:hover, .track:focus-visible{
-      background-color: var(--bg-color-dark);
+      background-color: var(--track-hover-color);
     }
 
     .image{    
@@ -29,7 +29,7 @@ template.innerHTML = `
       grid-row: 1 / 4; 
       display: flex;
       align-items: center;
-      margin-left: 0.25rem;
+
     } 
 
 
@@ -48,6 +48,13 @@ template.innerHTML = `
       color: var(--text-color); 
       padding-left: 0.5rem;
       padding-right: 0.5rem;
+    
+
+      overflow: hidden;
+      max-width: 50ch;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
 
     }
     .artist{
@@ -58,6 +65,11 @@ template.innerHTML = `
       color: var(--text-color-light); 
       padding-left: 0.5rem;
       padding-right: 0.5rem;
+
+      overflow: hidden;
+      max-width: 50ch;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .duration{
@@ -110,6 +122,8 @@ class Track extends HTMLElement {
     durationText: null,
     pauseOnTimeUpdate: false,
   };
+
+  #dom = {};
 
   #headerDiv;
 
@@ -424,61 +438,3 @@ class TrackInfo {
 
 customElements.define("ulut0002-track", Track);
 export default Track;
-
-/*
-Disabled code
-
-
-.controls{
-      grid-column: 2 / 3;
-      grid-row: 3 / 4; 
-      display: flex;
-      justify-content: start;
-      gap: 0.1rem;
-      
-    }
- 
-
-    .controller-container{
-      cursor: pointer;
-    }
-
-    .controller-btn{
-      font-size: 1rem !important;
-      padding:0 !important;
-      margin: 0 !important;
-    }
-
-    .controller-btn:active{
-      color: blue !important;
-    }
-  
-    button{
-      padding: 0 !important;
-      margin: 0 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      // border-radius: 100px !important;
-
-    }
-
-
-
-<div id="controls" class="controls">
-        <div id="btn-play" class="controller-container" controller>
-              <span  class="material-symbols-outlined controller-btn">play_arrow
-            </span>
-        </div>
-        <div id="btn-pause" class="controller-container" controller>
-        <span class="material-symbols-outlined controller-btn">
-            pause
-            </span>
-        </div>
-        <div id="btn-remove" class="controller-container" controller>
-            <span class="material-symbols-outlined controller-btn">
-            delete
-            </span>
-        </div>
-    </div>
-*/
