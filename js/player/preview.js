@@ -461,17 +461,13 @@ class Preview extends HTMLElement {
     this.#artistNameDiv.classList.remove("bounce-bottom");
 
     setTimeout(() => {
-      this.#image.classList.add("swirl-in-fwd");
       this.#image.src = ev.image;
-      if (ev.artist) {
-        this.#artistNameDiv.innerHTML = `by ${ev.artist}`;
-      }
-      if (ev.name) {
-        this.#trackNameDiv.innerHTML = ev.name;
-      }
+      if (ev.artist) this.#artistNameDiv.innerHTML = `by ${ev.artist}`;
+      if (ev.name) this.#trackNameDiv.innerHTML = ev.name;
 
       this.#trackNameDiv.classList.add("bounce-top");
       this.#artistNameDiv.classList.add("bounce-bottom");
+      this.#image.classList.add("swirl-in-fwd");
     }, 200);
 
     this.#image.animationPlayState = "running";
