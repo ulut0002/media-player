@@ -6,10 +6,6 @@ template.innerHTML = `
       :host {
         display: block;
         border: var(--header-border-width) solid var(--header-border-color);
-
-        // border-radius: var(--header-border-radius);
-
-        // background-color: var(--header-background-color);
       
         font-family: var(--font-family);
         // color: var(--header-text-color);
@@ -270,18 +266,18 @@ template.innerHTML = `
   </style>
   
   <div class="container">
-  <div id="header" class="header">
-    <span class="material-symbols-outlined note-color-1 delay3 slide-out-top ">music_note</span>
-    <span class="material-symbols-outlined note-color-2 delay1 slide-out-top ">music_note</span>    
-    <span class="material-symbols-outlined note-color-3 delay2 slide-out-top ">music_note</span>    
+    <div id="header" class="header">
+      <span class="material-symbols-outlined note-color-1 delay3 slide-out-top ">music_note</span>
+      <span class="material-symbols-outlined note-color-2 delay1 slide-out-top ">music_note</span>    
+      <span class="material-symbols-outlined note-color-3 delay2 slide-out-top ">music_note</span>    
 
-    <slot name="title">Title</slot>
+      <slot name="title">Title</slot>
 
-    <span class="material-symbols-outlined note-color-5 delay6 slide-out-top ">music_note</span>
-    <span class="material-symbols-outlined note-color-6 delay4 slide-out-top ">music_note</span>    
-    <span class="material-symbols-outlined note-color-4 delay5 slide-out-top ">music_note</span> 
-    
-  </div>
+      <span class="material-symbols-outlined note-color-5 delay6 slide-out-top ">music_note</span>
+      <span class="material-symbols-outlined note-color-6 delay4 slide-out-top ">music_note</span>    
+      <span class="material-symbols-outlined note-color-4 delay5 slide-out-top ">music_note</span> 
+      
+    </div>
   </div>
 
 
@@ -368,16 +364,16 @@ class Header extends HTMLElement {
           // hostStyle.style.setProperty(`--animation-1-scale-1`, 2);
         }
 
-        for (let index = 1; index <= 2; index++) {
-          const colorIndex = this.generateNumber(
-            0,
-            Header.COLOR_CODES.length - 1
-          );
-          hostStyle.style.setProperty(
-            `--header-color-${index}`,
-            Header.COLOR_CODES[colorIndex]
-          );
-        }
+        // for (let index = 1; index <= 2; index++) {
+        //   const colorIndex = this.generateNumber(
+        //     0,
+        //     Header.COLOR_CODES.length - 1
+        //   );
+        //   hostStyle.style.setProperty(
+        //     `--header-color-${index}`,
+        //     Header.COLOR_CODES[colorIndex]
+        //   );
+        // }
       }, 4000);
     }
   }
