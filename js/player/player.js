@@ -56,6 +56,7 @@ template.innerHTML = `
         display: flex;
         flex-direction: column;
         height: 100%;
+        background-color: var(--track-bg-color);
       }
       
       @media only screen and (min-width: 45rem) {
@@ -92,6 +93,8 @@ template.innerHTML = `
         .playlist {
           grid-column: 2 / 3;
           grid-row: 2 / 4;
+          
+          
  
 
         }
