@@ -1,7 +1,7 @@
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-      @import url("./style/player.css");
+      @import url("./css/style.css");
 
       :host {
         display: block;

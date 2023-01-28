@@ -4,7 +4,8 @@ import TrackProgress from "./track_progress.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-      @import url("./style/player.css");
+      @import url("./css/style.css");
+
 
       :host {
         background-color: var(--controls-background-color);

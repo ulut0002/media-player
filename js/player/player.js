@@ -14,8 +14,8 @@ template.innerHTML = `
       :host {
         display: block;
       }
-      
-      @import url("./style/player.css");
+      @import url("./css/style.css");
+
 
       .container {
         display: flex;
