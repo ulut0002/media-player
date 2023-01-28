@@ -4,6 +4,9 @@ const template = document.createElement("template");
 template.innerHTML = `
   <style>
 
+
+        @import url("./style/player.css");
+
         :host{
           display: block;
           height: 100%;
@@ -428,10 +431,12 @@ class Preview extends HTMLElement {
     player_key: null,
   };
 
-  #image = null;
-  #artistNameDiv = null;
-  #trackNameDiv = null;
-  #controlDiv = null;
+  #dom = {
+    image: null,
+    artistNameDiv: null,
+    trackNameDiv: null,
+    controlDiv: null,
+  };
 
   constructor() {
     super();
@@ -440,22 +445,10 @@ class Preview extends HTMLElement {
     const clone = template.content.cloneNode(true);
     this.root.append(clone);
 
-    let link = document.createElement("link");
-    link.rel = "stylesheet";
-    // link.href = "./player.css";
-    link.href = "../style/player.css";
-
-    this.root.appendChild(link);
-
-    link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0";
-    this.root.appendChild(link);
-    this.#image = this.root.getElementById("artwork");
-    this.#artistNameDiv = this.root.getElementById("artist_name");
-    this.#trackNameDiv = this.root.getElementById("track_name");
-    this.#controlDiv = this.root.getElementById("controls");
+    this.#dom.image = this.root.getElementById("artwork");
+    this.#dom.artistNameDiv = this.root.getElementById("artist_name");
+    this.#dom.trackNameDiv = this.root.getElementById("track_name");
+    this.#dom.controlDiv = this.root.getElementById("controls");
   }
 
   static get observedAttributes() {
@@ -477,15 +470,13 @@ class Preview extends HTMLElement {
       switch (attrName) {
         case "player_key":
           this.#data.player_key = newVal;
-          this.#controlDiv.setAttribute("player_key", this.player_key);
+          this.#dom.controlDiv.setAttribute("player_key", this.player_key);
           break;
       }
     }
   }
 
   async replaceImage(ev) {
-    console.log("values: ", "1: ", ev.image, "2: ", this.#image.src);
-
     /*
     TODO: 
 
@@ -494,29 +485,29 @@ class Preview extends HTMLElement {
 
      must find a way to match them
     */
-    if (ev.image.toLowerCase() == this.#image.src.toLowerCase()) {
-      console.log("caught");
+    if (ev.image.toLowerCase() == this.#dom.image.src.toLowerCase()) {
+      // console.log("caught");
       return;
     }
     // return;
-    this.#artistNameDiv.innerHTML = "";
-    this.#trackNameDiv.innerHTML = "";
+    this.#dom.artistNameDiv.innerHTML = "";
+    this.#dom.trackNameDiv.innerHTML = "";
 
-    this.#image.classList.remove("swirl-in-fwd");
-    this.#image.animationPlayState = "running";
+    this.#dom.image.classList.remove("swirl-in-fwd");
+    this.#dom.image.animationPlayState = "running";
 
-    this.#trackNameDiv.classList.remove("bounce-top");
-    this.#artistNameDiv.classList.remove("bounce-bottom");
+    this.#dom.trackNameDiv.classList.remove("bounce-top");
+    this.#dom.artistNameDiv.classList.remove("bounce-bottom");
 
-    this.#image.addEventListener("load", () => {
-      if (ev.artist) this.#artistNameDiv.innerHTML = `by ${ev.artist}`;
-      if (ev.name) this.#trackNameDiv.innerHTML = ev.name;
-      this.#trackNameDiv.classList.add("bounce-top");
-      this.#artistNameDiv.classList.add("bounce-bottom");
-      this.#image.classList.add("swirl-in-fwd");
+    this.#dom.image.addEventListener("load", () => {
+      if (ev.artist) this.#dom.artistNameDiv.innerHTML = `by ${ev.artist}`;
+      if (ev.name) this.#dom.trackNameDiv.innerHTML = ev.name;
+      this.#dom.trackNameDiv.classList.add("bounce-top");
+      this.#dom.artistNameDiv.classList.add("bounce-bottom");
+      this.#dom.image.classList.add("swirl-in-fwd");
     });
 
-    this.#image.src = ev.image;
+    this.#dom.image.src = ev.image;
 
     // setTimeout(() => {
     //   if (ev.artist) this.#artistNameDiv.innerHTML = `by ${ev.artist}`;
@@ -527,7 +518,7 @@ class Preview extends HTMLElement {
     //   this.#image.classList.add("swirl-in-fwd");
     // }, 100);
 
-    this.#image.animationPlayState = "running";
+    this.#dom.image.animationPlayState = "running";
   }
 
   connectedCallback() {
@@ -535,7 +526,7 @@ class Preview extends HTMLElement {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
-    this.#controlDiv.setAttribute("player_key", this.player_key);
+    this.#dom.controlDiv.setAttribute("player_key", this.player_key);
   }
 }
 

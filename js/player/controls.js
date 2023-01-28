@@ -4,92 +4,84 @@ import TrackProgress from "./track_progress.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
-    :host {
-       background-color: var(--controls-background-color);
+      @import url("./style/player.css");
 
-      border-top-right-radius: 0.40rem;
-      border-top-left-radius: 0.40rem;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    
-    .container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .progress {
-      width: 100%;
-      margin-top: 0.55rem;
-    }
-
-    .control__container {
-      display: flex;
-      flex-direction: row;
-      gap: 0.25rem;
-      align-items: center;
-      margin: 0.75rem 0;
-    }
-
-    .volume{
-      width: min(50%, 45rem);
-      // border: 5px solid green;
-      margin-bottom: 0.55rem;
-     
-    }
-
-        
-    .player-control-icon {
-      display: inline-block !important;
-      font-size: var(--control-icon-size) !important;
-      color: var(--controls-color) !important;
-      cursor: pointer;
-    }
-    
-    .player-control-icon:hover {
-      color: var(--controls-hover-color) !important;
-      transform: scale(var(--controls-hover-scale));
-    }
-
-    .hide {
-      display: none !important;
-    }
-    
-
-    
-  
-  
-
-
-
+      :host {
+        background-color: var(--controls-background-color);
+      
+        border-top-right-radius: 0.4rem;
+        border-top-left-radius: 0.4rem;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .progress {
+        width: 100%;
+        margin-top: 0.55rem;
+      }
+      
+      .control__container {
+        display: flex;
+        flex-direction: row;
+        gap: 0.25rem;
+        align-items: center;
+        margin: 0.75rem 0;
+      }
+      
+      .volume {
+        width: min(50%, 45rem);
+        // border: 5px solid green;
+        margin-bottom: 0.55rem;
+      }
+      
+      .player-control-icon {
+        display: inline-block !important;
+        font-size: var(--control-icon-size) !important;
+        color: var(--controls-color) !important;
+        cursor: pointer;
+      }
+      
+      .player-control-icon:hover {
+        color: var(--controls-hover-color) !important;
+        transform: scale(var(--controls-hover-scale));
+      }
+      
+      .hide {
+        display: none !important;
+      }
   </style>
 
   <div id="container" class="container">
     <ulut0002-progress id="progress" class="progress"></ulut0002-progress>
 
     <div id="control__container" class="control__container">
-      <span class="material-symbols-outlined player-control-icon center" title="Previous track" id="skip_previous">
+      <span class="material-symbols-outlined player-control-icon center" title="Previous" id="skip_previous">
         skip_previous
       </span>
 
-      <span class="material-symbols-outlined player-control-icon center" id="play_track">
+      <span class="material-symbols-outlined player-control-icon center" id="play_track" title="Press to pause">
         play_circle
       </span>
 
-      <span class="material-symbols-outlined player-control-icon hide" id="pause_track">
+      <span class="material-symbols-outlined player-control-icon hide" id="pause_track" title="Press to play">
         pause_circle
       </span>
 
-      <span class="material-symbols-outlined player-control-icon" id="skip_next">
+      <span class="material-symbols-outlined player-control-icon" id="skip_next" title="Next">
         skip_next
       </span>
 
       <slot name="shuffle">
-        <span class="material-symbols-outlined player-control-icon" id="shuffle">shuffle</span>
-        <span class="material-symbols-outlined player-control-icon hide" id="repeat">repeat</span>
-        <span class="material-symbols-outlined player-control-icon hide" id="repeat_one">repeat_one</span>
+        <span class="material-symbols-outlined player-control-icon" id="shuffle" title="Shuffle mode">shuffle</span>
+        <span class="material-symbols-outlined player-control-icon hide" id="repeat" title="Repeat playlist">repeat</span>
+        <span class="material-symbols-outlined player-control-icon hide" id="repeat_one" title="Repeat current track">repeat_one</span>
       </slot>
     </div>
 
@@ -104,6 +96,17 @@ class Controls extends HTMLElement {
     player_key: "",
   };
 
+  #dom = {
+    containerDiv: null,
+    btnPlayTrack: null,
+    btnPauseTrack: null,
+    btnShuffle: null,
+    btnRepeat: null,
+    btnRepeatOne: null,
+    progressEl: null,
+    containerDiv: null,
+  };
+
   constructor() {
     super();
 
@@ -111,29 +114,18 @@ class Controls extends HTMLElement {
     const clone = template.content.cloneNode(true);
     this.root.append(clone);
 
-    let link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "../style/player.css";
-    this.root.appendChild(link);
+    this.#dom.containerDiv = this.root.getElementById("container");
+    this.#dom.btnPlayTrack = this.root.getElementById("play_track");
+    this.#dom.btnPauseTrack = this.root.getElementById("pause_track");
 
-    link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0";
-    this.root.appendChild(link);
+    this.#dom.btnShuffle = this.root.getElementById("shuffle");
+    this.#dom.btnRepeat = this.root.getElementById("repeat");
+    this.#dom.btnRepeatOne = this.root.getElementById("repeat_one");
 
-    this.#data.containerDiv = this.root.getElementById("container");
-    this.#data.btnPlayTrack = this.root.getElementById("play_track");
-    this.#data.btnPauseTrack = this.root.getElementById("pause_track");
+    this.#dom.progressEl = this.root.getElementById("progress");
 
-    this.#data.btnShuffle = this.root.getElementById("shuffle");
-    this.#data.btnRepeat = this.root.getElementById("repeat");
-    this.#data.btnRepeatOne = this.root.getElementById("repeat_one");
-
-    this.#data.progressEl = this.root.getElementById("progress");
-
-    if (this.#data.containerDiv) {
-      this.#data.containerDiv.addEventListener("click", (ev) => {
+    if (this.#dom.containerDiv) {
+      this.#dom.containerDiv.addEventListener("click", (ev) => {
         this.handleClick.call(this, ev);
       });
     }
@@ -174,7 +166,7 @@ class Controls extends HTMLElement {
   }
 
   set player_key(value) {
-    this.#data.player_key = value;
+    // this.#data.player_key = value;
     this.setAttribute("player_key", value);
   }
 
@@ -186,8 +178,8 @@ class Controls extends HTMLElement {
       switch (attrName) {
         case "player_key":
           this.#data.player_key = newVal;
-          if (this.#data.progressEl)
-            this.#data.progressEl.player_key = this.#data.player_key;
+          if (this.#dom.progressEl)
+            this.#dom.progressEl.player_key = this.#data.player_key;
 
           rebuild = true;
           break;
@@ -196,18 +188,18 @@ class Controls extends HTMLElement {
   }
 
   connectedCallback() {
-    if (this.#data.progressEl)
-      this.#data.progressEl.player_key = this.#data.player_key;
+    if (this.#dom.progressEl)
+      this.#dom.progressEl.player_key = this.#data.player_key;
   }
 
   pauseTrack(ev) {
-    this.#data.btnPlayTrack.classList.toggle("hide");
-    this.#data.btnPauseTrack.classList.toggle("hide");
+    this.#dom.btnPlayTrack.classList.toggle("hide");
+    this.#dom.btnPauseTrack.classList.toggle("hide");
   }
 
   playTrack(ev) {
-    this.#data.btnPlayTrack.classList.toggle("hide");
-    this.#data.btnPauseTrack.classList.toggle("hide");
+    this.#dom.btnPlayTrack.classList.toggle("hide");
+    this.#dom.btnPauseTrack.classList.toggle("hide");
   }
 
   skipPrevious() {}
@@ -215,21 +207,21 @@ class Controls extends HTMLElement {
   skipNext() {}
 
   shuffle(ev) {
-    this.#data.btnShuffle.classList.add("hide");
-    this.#data.btnRepeat.classList.remove("hide");
-    this.#data.btnRepeatOne.classList.add("hide");
+    this.#dom.btnShuffle.classList.add("hide");
+    this.#dom.btnRepeat.classList.remove("hide");
+    this.#dom.btnRepeatOne.classList.add("hide");
   }
 
   repeat(ev) {
-    this.#data.btnShuffle.classList.add("hide");
-    this.#data.btnRepeat.classList.add("hide");
-    this.#data.btnRepeatOne.classList.remove("hide");
+    this.#dom.btnShuffle.classList.add("hide");
+    this.#dom.btnRepeat.classList.add("hide");
+    this.#dom.btnRepeatOne.classList.remove("hide");
   }
 
   repeatOne(ev) {
-    this.#data.btnShuffle.classList.remove("hide");
-    this.#data.btnRepeat.classList.add("hide");
-    this.#data.btnRepeatOne.classList.add("hide");
+    this.#dom.btnShuffle.classList.remove("hide");
+    this.#dom.btnRepeat.classList.add("hide");
+    this.#dom.btnRepeatOne.classList.add("hide");
   }
 }
 

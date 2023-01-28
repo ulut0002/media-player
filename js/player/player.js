@@ -15,6 +15,8 @@ template.innerHTML = `
         display: block;
       }
       
+      @import url("./style/player.css");
+
       .container {
         display: flex;
         flex-direction: column;
@@ -22,13 +24,17 @@ template.innerHTML = `
         color: var(--font-color);
         padding: 0;
         margin: 0;
+        min-height: 100vh;
+
+        background: var(--preview-background);
+        background-image: var(--preview-background-gradient);
       }
       
       .header {
         padding: 0;
         margin: 0;
-        background-color: var(--header-main-bg);
-        background-image: var(--header-background-gradient);
+        // background-color: var(--header-main-bg);
+        //  background-image: var(--header-background-gradient);
       }
       
       .preview {
@@ -38,17 +44,18 @@ template.innerHTML = `
         display: flex;
         flex-direction: column;
       
-        background: var(--preview-background);
-        background-image: var(--preview-background-gradient);
+        // background: var(--preview-background);
+        // background-image: var(--preview-background-gradient);
       }
       
       .playlist {
         grid-column: 1 / 2;
         grid-row: 4 / 5;
-        background-color: green;
+    
         
         display: flex;
         flex-direction: column;
+        height: 100%;
       }
       
       @media only screen and (min-width: 45rem) {
@@ -65,6 +72,8 @@ template.innerHTML = `
             minmax(min-content, max-content)
             1fr
             minmax(min-content, max-content);
+
+        
         }
       
         .header {
@@ -77,12 +86,14 @@ template.innerHTML = `
           grid-row: 2 / 3;
           display: flex;
           flex-direction: column;
+      
         }
       
         .playlist {
           grid-column: 2 / 3;
           grid-row: 2 / 4;
-          background-color: green;
+ 
+
         }
       }
       
@@ -144,7 +155,7 @@ class Player extends HTMLElement {
 
     if (!this.player_key) {
       this.player_key = generateRandomString(10);
-      console.log(this.player_key);
+      // console.log(this.player_key);
     }
 
     this.#playerDiv = this.root.getElementById("player");
@@ -194,7 +205,7 @@ class Player extends HTMLElement {
     }
 
     document.addEventListener("trackPlayed", (e) => {
-      console.log("track playing ", e.detail);
+      // console.log("track playing ", e.detail);
     });
 
     this.buildPlayer();

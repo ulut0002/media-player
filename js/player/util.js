@@ -1,18 +1,6 @@
-function convertSecondsToHMS(seconds) {
-  seconds = Math.floor(seconds);
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return { hours, minutes, secs };
-}
-
-function getLastTwo(val) {
-  let value = val;
-  value = "0000" + value.toString();
-  return value.substring(value.length - 2, value.length);
-}
-
 //source: chatGPT
+// Each <player> object and its sub-elements have the same random id.
+// This function generates a random id in given length.
 export function generateRandomString(length) {
   let text = "";
   let possible =
@@ -24,6 +12,8 @@ export function generateRandomString(length) {
   return text;
 }
 
+// This function accepts a decimal "seconds" value, and..
+// convert it to hh:mm:ss format.
 export function convertSecondsToHMSString(seconds) {
   const val = convertSecondsToHMS(seconds);
   const valStr = { hours: "", minutes: "", secs: "" };
@@ -46,4 +36,18 @@ export function convertSecondsToHMSString(seconds) {
     return `${valStr.minutes}:${valStr.secs}`;
   }
   return `00:${valStr.secs}`;
+}
+
+function convertSecondsToHMS(seconds) {
+  seconds = Math.floor(seconds);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return { hours, minutes, secs };
+}
+
+function getLastTwo(val) {
+  let value = val;
+  value = "0000" + value.toString();
+  return value.substring(value.length - 2, value.length);
 }

@@ -14,8 +14,8 @@ function playEvent(trackObj) {
   return createEvent(type, data);
 }
 
-function volumeChanged(player_key, newVolume = 70) {
-  const type = `change-volume-${player_key}`;
+function volumeChanged(newVolume = 70) {
+  const type = `change-volume`;
   const data = {
     volume: newVolume,
   };

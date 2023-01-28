@@ -13,7 +13,6 @@ This event will be handled by the currently playing track. The track event will 
 # Listens to 'track-is-playing' event. This event is fired by the track component every second. The component updates the remaining time, and played time in the component. 
 
 
-
  */
 
 import {
@@ -26,6 +25,9 @@ import { convertSecondsToHMSString } from "./util.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
+
+    @import url("./style/player.css");
+
     :host {
       display: block;
     }
@@ -86,9 +88,9 @@ template.innerHTML = `
   </style>
 
   <div id="container" class="container">
-      <div id="played_time" class="text played_time"></div>
-      <input type="range" id="progress" class="progress" name="volume" min="0" max="100" value="0" step="1" >
-      <div id="remaining_time" class="text remaining_time"></div>
+      <div id="played_time" class="text played_time" title="Played time"></div>
+      <input type="range" id="progress" class="progress" name="volume" min="0" max="100" value="0" step="1" title="Progress bar">
+      <div id="remaining_time" class="text remaining_time" title="Remaining time"></div>
   </div>    
 `;
 
@@ -97,10 +99,13 @@ class TrackProgress extends HTMLElement {
   #data = {
     currentPosition: 0,
     player_key: "",
+    playing: false,
+  };
+
+  #dom = {
     range: null,
     playedTime: null,
     remainingTime: null,
-    playing: null,
   };
 
   constructor() {
@@ -108,30 +113,16 @@ class TrackProgress extends HTMLElement {
     this.root = this.attachShadow({ mode: "closed" });
     this.root.append(template.content.cloneNode(true));
 
-    let link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "../style/player.css";
-    this.root.appendChild(link);
-
-    link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0";
-    this.root.appendChild(link);
-
     this.#data.playedTime = this.root.getElementById("played_time");
-    this.#data.range = this.root.getElementById("progress");
-    this.#data.remainingTime = this.root.getElementById("remaining_time");
+    this.#dom.range = this.root.getElementById("progress");
+    this.#dom.remainingTime = this.root.getElementById("remaining_time");
 
-    this.#data.range.addEventListener(
+    this.#dom.range.addEventListener(
       "change",
       this.handleRangeChange.bind(this)
     );
 
-    this.#data.range.addEventListener(
-      "input",
-      this.handleRangeInput.bind(this)
-    );
+    this.#dom.range.addEventListener("input", this.handleRangeInput.bind(this));
   }
 
   static get observedAttributes() {
@@ -152,18 +143,16 @@ class TrackProgress extends HTMLElement {
 
       switch (attrName) {
         case "player_key":
-          console.log("boom!", newVal);
           this.#data.player_key = newVal;
-          // console.log("xx", this.#data.player_key);
-
+          //the event listener is here because this is the only place to access to the player_key.
+          //connectedCallback() does not read the player_key field
           document.addEventListener(
             `track-is-playing-${this.#data.player_key}`,
             (ev) => {
-              console.log(ev);
-              if (this.#data.range && ev.detail.percentage) {
-                this.#data.range.value = ev.detail.percentage;
+              if (this.#dom.range && ev.detail.percentage) {
+                this.#dom.range.value = ev.detail.percentage;
               }
-              this.#data.remainingTime.textContent = convertSecondsToHMSString(
+              this.#dom.remainingTime.textContent = convertSecondsToHMSString(
                 ev.detail.duration - ev.detail.currentPosition
               );
               this.#data.playedTime.textContent = convertSecondsToHMSString(
@@ -177,24 +166,27 @@ class TrackProgress extends HTMLElement {
     }
   }
   disconnectedCallback() {}
-  connectedCallback() {
-    // console.log("progress", this.#data.player_key);
-  }
+  connectedCallback() {}
 
-  handleRangeInput(ev) {
+  // Trigger: User starts changing the input (seeking new positions every time)
+  // Action: Playing track should stop sending current date-time info (Confusing UI element)
+  async handleRangeInput(ev) {
     const event = enableDisableTrackTime(this.#data.player_key, true);
     if (event) {
       document.dispatchEvent(event);
     }
   }
 
+  // Trigger: User submitting
+  // Action: If no song is being played right now, prevent change. Go back to zero
+  // Action: If there is a playing song,
+  //    1) send an event to make track stop sending current date/time values
+  //    2) send another event to force track.audio object to change time on playing track
   handleRangeChange(ev) {
-    // This is unlike the change event, which only fires when the value is committed, such as by pressing the enter key, selecting a value from a list of options, and the like.
-
-    //if no song is playing, then prevent range change. No need.
+    //if no song is playing, then prevent this change.
     if (!this.#data.playing) {
       this.#data.currentPosition = 0;
-      this.#data.range.value = 0;
+      this.#dom.range.value = 0;
       return;
     }
 

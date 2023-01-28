@@ -1,7 +1,0 @@
-
-
-Progress:
-
-1. Range input: Pause track's onTimeUpdate, 
-2. Range update: Set miliseonds on Track, continue track onTimeUpdate
-

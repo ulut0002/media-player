@@ -5,6 +5,10 @@ const template = document.createElement("template");
 
 template.innerHTML = `
 <style> 
+
+
+    @import url("./style/player.css");
+
     :host{
         display: block;
         font-family: var(--font-family);
@@ -22,6 +26,10 @@ template.innerHTML = `
     
     .track:hover, .track:focus-visible{
       background-color: var(--track-hover-color);
+    }
+
+    .playing{
+      background-color: var(--track-playing-item-highlight);
     }
 
     .image{    
@@ -99,8 +107,6 @@ template.innerHTML = `
     <div id="duration" class="duration">
       <slot name="duration">Duration</slot>
     </div>
-
-    
 </div>
 
 `;
@@ -121,6 +127,7 @@ class Track extends HTMLElement {
     duration: null,
     durationText: null,
     pauseOnTimeUpdate: false,
+    volume: 0,
   };
 
   #dom = {};
@@ -133,18 +140,6 @@ class Track extends HTMLElement {
     this.root = this.attachShadow({ mode: "closed" });
     const clone = template.content.cloneNode(true);
     this.root.append(clone);
-
-    // Why "link"? visit https://github.com/google/material-design-icons/issues/1165
-    let link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "../style/player.css";
-    this.root.appendChild(link);
-
-    link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0";
-    this.root.appendChild(link);
 
     this.#data.id = generateRandomString(10);
     this.#headerDiv = this.root.querySelector("#track");
@@ -191,39 +186,32 @@ class Track extends HTMLElement {
   }
 
   attributeChangedCallback(attrName, oldVal, newVal) {
-    let rebuild = false;
     if (oldVal != newVal) {
       attrName = attrName.toLowerCase().trim();
 
       switch (attrName) {
         case "file":
           this.#data.file = newVal;
-          rebuild = true;
           break;
 
         case "image":
           this.#data.image = newVal;
-          rebuild = true;
           break;
 
         case "thumbnail":
           this.#data.thumbnail = newVal;
-          rebuild = true;
           break;
 
         case "artist":
           this.#data.artist = newVal;
-          rebuild = true;
           break;
 
         case "name":
           this.#data.name = newVal;
-          rebuild = true;
           break;
 
         case "player_key":
           this.#data.player_key = newVal;
-          rebuild = true;
           break;
       }
     }
@@ -233,46 +221,49 @@ class Track extends HTMLElement {
 
   disconnectedCallback() {}
 
-  updateVolume(data) {
+  handleVolumeChangeEvent(data) {
+    // console.log("volume event caught ", data.volume);
+
+    this.#data.volume = data.volume;
     if (this.#data.audio) {
       this.#data.audio.volume = data.volume / 100;
     }
   }
 
-  // @data.position represents a percentage
+  // "data.position" represents a percentage
   seekPosition(data) {
     const position = data.position ? data.position : 0;
     if (this.#data.audio) {
-      // console.log("outside");
-
       const duration = this.#data.audio.duration;
       const seekPos = (data.position * duration) / 100;
       this.#data.audio.currentTime = seekPos;
-
-      // this.#data.audio.currentTime = data.volume / 100;
     }
   }
 
   connectedCallback() {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       if (ev.detail.id === this.#data.id) {
-        console.log(`Playing`, this.#data.name);
-        this.#data.audio.paused
-          ? this.#data.audio.play()
-          : this.#data.audio.pause();
-      } else {
-        if (this.#data.audio && !this.#data.audio.paused) {
-          console.log("Pause current song ");
+        if (this.#data.audio.paused) {
+          this.#data.audio.play();
+          this.#headerDiv.classList.add("playing");
+        } else {
           this.#data.audio.pause();
+          this.#headerDiv.classList.remove("playing");
+        }
+      } else {
+        // if the track catches this event, and it is not the current track, then it goes back to the beginning of the track
+
+        if (this.#data.audio && !this.#data.audio.paused) {
+          this.#headerDiv.classList.remove("playing");
+
+          this.#data.audio.pause();
+          this.#data.audio.currentTime = 0;
         }
       }
 
-      document.addEventListener(
-        `change-volume-${this.#data.player_key}`,
-        (ev) => {
-          this.updateVolume.call(this, ev.detail);
-        }
-      );
+      document.addEventListener(`change-volume`, (ev) => {
+        this.handleVolumeChangeEvent.call(this, ev.detail);
+      });
 
       document.addEventListener(
         `pause-on-timer-update-${this.#data.player_key}`,
@@ -329,7 +320,8 @@ class Track extends HTMLElement {
 
         this.#data.audio.addEventListener("timeupdate", () => {
           // console.log("registered");
-          this.handleOnTimeUpdate.call(this);
+          // TODO: Enable this code later
+          // this.handleOnTimeUpdate.call(this);
         });
       }
     }

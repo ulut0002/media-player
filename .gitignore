@@ -1,2 +1,5 @@
 .DS_Store
 .vscode/
+./player/validate.html
+./player/validate.css
+
