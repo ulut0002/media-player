@@ -431,6 +431,7 @@ template.innerHTML = `
 class Preview extends HTMLElement {
   #data = {
     player_key: null,
+    track_id: null,
   };
 
   #dom = {
@@ -479,21 +480,13 @@ class Preview extends HTMLElement {
   }
 
   async replaceImage(ev) {
-    /*
-    TODO: 
+    //no need to replace the image if it is the same track.
+    if (this.#data.track_id === ev.id) return;
 
-      val 1:  ./img/paul_mccartney_michael_jackson_say_say_say.jpeg 
-      val 2:  http://127.0.0.1:5501/img/paul_mccartney_michael_jackson_say_say_say.jpeg
-
-     must find a way to match them
-    */
-    if (ev.image.toLowerCase() == this.#dom.image.src.toLowerCase()) {
-      // console.log("caught");
-      return;
-    }
     // return;
     this.#dom.artistNameDiv.innerHTML = "";
     this.#dom.trackNameDiv.innerHTML = "";
+    this.#data.track_id = ev.id;
 
     this.#dom.image.classList.remove("swirl-in-fwd");
     this.#dom.image.animationPlayState = "running";
@@ -528,6 +521,14 @@ class Preview extends HTMLElement {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
+
+    document.addEventListener(
+      `preview-track-${this.#data.player_key}`,
+      (ev) => {
+        console.log("preview track caught");
+        this.replaceImage.call(this, ev.detail);
+      }
+    );
   }
 }
 

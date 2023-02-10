@@ -1,5 +1,11 @@
 import { convertSecondsToHMSString, generateRandomString } from "./util.js";
-import { playEvent, trackIsPlaying } from "./player-event.js";
+import {
+  playEvent,
+  trackIsPlaying,
+  currentMediaChangeEvent,
+  previewEvent,
+} from "./player-event.js";
+import Player from "./player.js";
 
 const template = document.createElement("template");
 
@@ -133,7 +139,10 @@ class Track extends HTMLElement {
     durationText: null,
     pauseOnTimeUpdate: false,
     volume: 0,
+    activeTrack: false,
   };
+
+  #timerInterval = null;
 
   #dom = {};
 
@@ -149,6 +158,7 @@ class Track extends HTMLElement {
     this.#data.id = generateRandomString(10);
     this.#headerDiv = this.root.querySelector("#track");
   }
+
   static get observedAttributes() {
     return ["file", "image", "thumbnail", "artist", "name", "player_key"];
   }
@@ -222,17 +232,12 @@ class Track extends HTMLElement {
     }
   }
 
-  rebuildComponent() {}
+  disconnectedCallback() {
+    this.#data = null;
+  }
 
-  disconnectedCallback() {}
-
-  handleVolumeChangeEvent(data) {
-    // console.log("volume event caught ", data.volume);
-
-    this.#data.volume = data.volume;
-    if (this.#data.audio) {
-      this.#data.audio.volume = data.volume / 100;
-    }
+  getTrackID() {
+    return this.#data.id;
   }
 
   // "data.position" represents a percentage
@@ -240,52 +245,12 @@ class Track extends HTMLElement {
     const position = data.position ? data.position : 0;
     if (this.#data.audio) {
       const duration = this.#data.audio.duration;
-      const seekPos = (data.position * duration) / 100;
+      const seekPos = (position * duration) / 100;
       this.#data.audio.currentTime = seekPos;
     }
   }
 
   connectedCallback() {
-    document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
-      if (ev.detail.id === this.#data.id) {
-        if (this.#data.audio.paused) {
-          this.#data.audio.play();
-          this.#headerDiv.classList.add("playing");
-        } else {
-          this.#data.audio.pause();
-          this.#headerDiv.classList.remove("playing");
-        }
-      } else {
-        // if the track catches this event, and it is not the current track, then it goes back to the beginning of the track
-
-        if (this.#data.audio && !this.#data.audio.paused) {
-          this.#headerDiv.classList.remove("playing");
-
-          this.#data.audio.pause();
-          this.#data.audio.currentTime = 0;
-        }
-      }
-
-      document.addEventListener(`change-volume`, (ev) => {
-        this.handleVolumeChangeEvent.call(this, ev.detail);
-      });
-
-      document.addEventListener(
-        `pause-on-timer-update-${this.#data.player_key}`,
-        (ev) => {
-          this.#data.pauseOnTimeUpdate = ev.detail.enable;
-        }
-      );
-
-      document.addEventListener(
-        `seek-position-${this.#data.player_key}`,
-        (ev) => {
-          this.seekPosition.call(this, ev.detail);
-        }
-      );
-    });
-
-    //TODO:
     let slot;
     slot = this.root.querySelector("slot[name=title]");
     if (slot) {
@@ -303,30 +268,87 @@ class Track extends HTMLElement {
       }
     }
 
-    if (!this.#data.artist) {
-      this.#data.artist = "unknown artist";
-    }
+    // fall back
+    if (!this.#data.artist) this.#data.artist = "unknown artist";
+    if (!this.#data.name) this.#data.name = "unknown track";
 
-    if (!this.#data.name) {
-      this.#data.name = "unknown track";
-    }
+    this.addEventListeners();
+  }
 
-    if (this.#headerDiv) {
-      // this.#headerDiv.setAttribute("track_key", this.#data.id);
-      // this.#headerDiv.setAttribute("player_key", this.#data.player_key);
-    }
+  addEventListeners() {
+    document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
+      if (ev.detail.id === this.#data.id) {
+        // if user clicks on the same track, pause/play
+        this.#data.activeTrack = true;
+        this.pausePlayCurrentTrack({ full: true });
+      } else {
+        // if the track catches this event, and it is not the current track,
+        //then it goes back to the beginning of the track
+        if (this.#timerInterval) {
+          clearInterval(this.#timerInterval);
+        }
+        if (this.#data.audio && !this.#data.audio.paused) {
+          this.#data.audio.pause();
+          this.#data.audio.currentTime = 0;
+          this.#headerDiv.classList.remove("playing");
+        }
+      }
+
+      document.addEventListener(
+        `pause-on-timer-update-${this.#data.player_key}`,
+        (ev) => {
+          this.#data.pauseOnTimeUpdate = ev.detail.enable;
+        }
+      );
+
+      document.addEventListener(
+        `seek-position-${this.#data.player_key}`,
+        (ev) => {
+          this.seekPosition.call(this, ev.detail);
+        }
+      );
+    });
+
+    document.addEventListener(
+      `control-track-event-${this.#data.player_key}`,
+      (ev) => {
+        if (this.#data.activeTrack) {
+          this.pausePlayCurrentTrack();
+        }
+      }
+    );
+
+    document.addEventListener(
+      `set-current-track-${this.#data.player_key}`,
+      (ev) => {
+        console.log("First track: ", ev.detail.track_id);
+        if (ev.detail.track_id === this.#data.id) {
+          //
+          this.#data.activeTrack = true;
+          this.#headerDiv.classList.add("playing");
+
+          const event = previewEvent({
+            player_key: this.#data.player_key,
+            id: this.#data.id,
+            image: this.#data.image,
+            artist: this.#data.artist,
+            name: this.#data.name,
+          });
+          console.log("event detail on load: ", event.type);
+          if (event) {
+            setTimeout(() => {
+              document.dispatchEvent(event);
+            }, 100);
+          }
+        }
+      }
+    );
 
     if (this.#data.file) {
       this.#data.audio = new Audio(this.#data.file);
       if (this.#data.audio) {
         this.#data.audio.addEventListener("loadedmetadata", () => {
           this.handleDurationRetrieval.call(this);
-        });
-
-        this.#data.audio.addEventListener("timeupdate", () => {
-          // console.log("registered");
-          // TODO: Enable this code later
-          // this.handleOnTimeUpdate.call(this);
         });
       }
     }
@@ -342,61 +364,48 @@ class Track extends HTMLElement {
     }
   }
 
-  handleTrackClick(selectedTrack) {
-    // if (!selectedTrack || !selectedTrack.id || !selectedTrack.player_key)
-    //   return;
+  pausePlayCurrentTrack(options = { full: false }) {
+    if (this.#data.audio.paused) {
+      this.#data.audio.play();
+      if (options.full) this.#headerDiv.classList.add("playing");
 
-    // console.log("inside", selectedTrack);
-    this.handlePlayButton(selectedTrack);
-  }
+      const event = currentMediaChangeEvent(this.#data.player_key, true);
+      if (event) {
+        document.dispatchEvent(event);
+      }
 
-  handlePlayButton(selectedTrack) {
-    // console.log("inside handle");
-    const event = playEvent(selectedTrack);
-    if (event) {
-      document.dispatchEvent(event);
-      // console.log("event dispatached", event.detail);
-    }
-  }
-
-  handlePauseButton() {
-    this.pauseTrack();
-  }
-  handleRemoveButton() {
-    this.removeTrack();
-  }
-
-  playTrack() {
-    // document.dispatchEvent()
-    // return;
-
-    if (this.#data.audio) {
-      if (this.#data.audio.paused) {
-        const fileName = this.file;
-        // console.log("file name", this.file);
-        document.dispatchEvent(
-          new CustomEvent("trackPlayed", {
-            detail: { file: fileName },
-          })
-        );
-        // console.log("end event dispatch");
-      } else {
-        this.#data.audio.currentTime = 0;
-        // this.#audio.play();
+      this.#timerInterval = setInterval(
+        this.handleOnTimeUpdate.bind(this),
+        1000
+      ); // every second
+    } else {
+      this.#data.audio.pause();
+      if (options.full) this.#headerDiv.classList.remove("playing");
+      if (this.#timerInterval) {
+        clearInterval(this.#timerInterval);
+      }
+      const event = currentMediaChangeEvent(this.#data.player_key, false);
+      if (event) {
+        document.dispatchEvent(event);
       }
     }
   }
-  pauseTrack() {
-    // console.log("pause me");
-    // return;
-    if (this.#data.audio) {
-      if (this.#data.audio.paused) return;
-      this.#data.audio.pause();
+  //When user clicks on the link
+  handleTrackClick(selectedTrack) {
+    this.handlePlayButton(selectedTrack);
+  }
+
+  // It fires a play event with current track.
+  // Multiple components catch the event.
+  // Play event is: play-track-${trackObj.player_key}
+  handlePlayButton(selectedTrack) {
+    const event = playEvent(selectedTrack);
+    if (event) {
+      document.dispatchEvent(event);
     }
   }
-  stopTrack() {}
-  removeTrack() {}
 
+  // The track's duration is retrieved, formatted and displayed on the screen
   handleDurationRetrieval() {
     const formattedText = convertSecondsToHMSString(this.#data.audio.duration);
     this.#data.duration = this.#data.audio.duration;
@@ -404,15 +413,19 @@ class Track extends HTMLElement {
     const el = this.root.querySelector("[name='duration']");
     if (el) el.textContent = formattedText;
   }
-  handleOnTimeUpdate(data) {
+
+  handleOnTimeUpdate() {
     // console.log("currentTime", this.#data.audio.currentTime);
     //fire trigger for control
+
+    // console.log(`inside handleOnTimeUpdate for ${this.#data.name}`);
     if (this.#data.pauseOnTimeUpdate) return;
 
     const event = trackIsPlaying(
       this.#data.player_key,
       this.#data.audio.currentTime,
-      this.#data.audio.duration
+      this.#data.audio.duration,
+      this.#data.id
     );
     if (event) {
       document.dispatchEvent(event);

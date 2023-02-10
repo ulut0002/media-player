@@ -6,6 +6,7 @@ import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
 
 import { generateRandomString } from "./util.js";
+import { setCurrentTrackEvent } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -227,6 +228,12 @@ class Player extends HTMLElement {
     });
 
     this.buildPlayer();
+
+    // add event
+    document.addEventListener(
+      `player-event-${this.player_key}`,
+      this.handlePlayerEvent.bind(this)
+    );
   }
 
   disconnectedCallback() {
@@ -235,7 +242,7 @@ class Player extends HTMLElement {
 
   buildPlayer() {
     this.#dom.previewDiv.setAttribute("player_key", this.player_key);
-
+    let firstTrackID = "";
     //add tracks to the playlist
     if (this.#dom.playlistDiv) {
       const divEl = document.createElement("div");
@@ -270,7 +277,19 @@ class Player extends HTMLElement {
 
         trackEl.setAttribute("player_key", this.player_key);
         divEl.append(trackEl);
+        if (!firstTrackID) {
+          firstTrackID = trackEl.getTrackID();
+        }
       });
+    }
+
+    if (firstTrackID) {
+      //dispatch event
+      const event = setCurrentTrackEvent({
+        player_key: this.player_key,
+        track_id: firstTrackID,
+      });
+      document.dispatchEvent(event);
     }
   }
 
@@ -297,6 +316,10 @@ class Player extends HTMLElement {
           break;
       }
     }
+  }
+
+  async handlePlayerEvent(ev) {
+    console.log(ev.detail);
   }
 }
 

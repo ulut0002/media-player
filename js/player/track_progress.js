@@ -100,6 +100,7 @@ class TrackProgress extends HTMLElement {
   #data = {
     currentPosition: 0,
     player_key: "",
+    track_key: "",
     playing: false,
   };
 
@@ -144,18 +145,26 @@ class TrackProgress extends HTMLElement {
 
       switch (attrName) {
         case "player_key":
+          const oldEventType = `track-is-playing-${this.#data.player_key}`;
+          // if (EventTarget.hasEventListener(oldEventType)) {
+          //   document.removeEventListener(oldEventType);
+          // }
+
           this.#data.player_key = newVal;
+
           //the event listener is here because this is the only place to access to the player_key.
           //connectedCallback() does not read the player_key field
           document.addEventListener(
             `track-is-playing-${this.#data.player_key}`,
             (ev) => {
-              if (this.#dom.range && ev.detail.percentage) {
-                this.#dom.range.value = ev.detail.percentage;
+              // console.log(ev.detail);
+              if (this.#dom.range) {
+                this.#dom.range.value = Math.floor(ev.detail.percentage);
               }
               this.#dom.remainingTime.textContent = convertSecondsToHMSString(
                 ev.detail.duration - ev.detail.currentPosition
               );
+
               this.#data.playedTime.textContent = convertSecondsToHMSString(
                 ev.detail.currentPosition
               );
@@ -184,13 +193,6 @@ class TrackProgress extends HTMLElement {
   //    1) send an event to make track stop sending current date/time values
   //    2) send another event to force track.audio object to change time on playing track
   handleRangeChange(ev) {
-    //if no song is playing, then prevent this change.
-    if (!this.#data.playing) {
-      this.#data.currentPosition = 0;
-      this.#dom.range.value = 0;
-      return;
-    }
-
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
     // console.log("track is ", i);
