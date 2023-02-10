@@ -140,6 +140,9 @@ class Player extends HTMLElement {
   #imagePath = "";
   #mediaPath = "";
 
+  // imagePath: "./img/",
+  // mediaPath: "./media/",
+
   #currentTrack = undefined;
   #playerDiv = undefined;
   #playlistDiv = undefined;
