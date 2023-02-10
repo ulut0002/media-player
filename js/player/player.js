@@ -57,6 +57,8 @@ template.innerHTML = `
         flex-direction: column;
         height: 100%;
         background-color: var(--track-bg-color);
+        overflow-x: auto;
+
       }
       
       @media only screen and (min-width: 45rem) {
@@ -93,10 +95,11 @@ template.innerHTML = `
         .playlist {
           grid-column: 2 / 3;
           grid-row: 2 / 4;
-          
-          
- 
+        }
 
+        .controls {
+          grid-column: 1 / 3;
+          grid-row: 3/4;
         }
       }
       
@@ -117,6 +120,7 @@ template.innerHTML = `
       </div>
 
       <div id="playlist" class="playlist"></div>
+      <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
     </div>
 
 
@@ -140,15 +144,14 @@ class Player extends HTMLElement {
   #imagePath = "";
   #mediaPath = "";
 
-  // imagePath: "./img/",
-  // mediaPath: "./media/",
-
-  #currentTrack = undefined;
-  #playerDiv = undefined;
-  #playlistDiv = undefined;
-  #headerDiv = undefined;
-  #previewDiv = undefined;
-  #controlDiv = undefined;
+  // dom elements
+  #dom = {
+    playerDiv: null,
+    playlistDiv: null,
+    headerDiv: null,
+    controlDiv: null,
+    previewDiv: null,
+  };
 
   constructor() {
     super();
@@ -161,17 +164,16 @@ class Player extends HTMLElement {
 
     if (!this.player_key) {
       this.player_key = generateRandomString(10);
-      // console.log(this.player_key);
     }
 
-    this.#playerDiv = this.root.getElementById("player");
-    this.#playlistDiv = this.root.getElementById("playlist");
-    this.#headerDiv = this.root.getElementById("header");
+    this.#dom.playerDiv = this.root.getElementById("player");
+    this.#dom.playlistDiv = this.root.getElementById("playlist");
+    this.#dom.headerDiv = this.root.getElementById("header");
+    this.#dom.controlDiv = this.root.getElementById("controls");
 
-    this.#previewDiv = this.root
+    this.#dom.previewDiv = this.root
       .getElementById("preview")
       .querySelector("ulut0002-preview");
-    // console.log(this.#headerDiv);
   }
 
   static get observedAttributes() {
@@ -209,6 +211,7 @@ class Player extends HTMLElement {
     if (this.#mediaPath && this.#mediaPath.at(-1) !== "/") {
       this.#mediaPath += "/";
     }
+    this.#dom.controlDiv.setAttribute("player_key", this.player_key);
 
     document.addEventListener("trackPlayed", (e) => {
       // console.log("track playing ", e.detail);
@@ -222,10 +225,10 @@ class Player extends HTMLElement {
   }
 
   buildPlayer() {
-    this.#previewDiv.setAttribute("player_key", this.player_key);
+    this.#dom.previewDiv.setAttribute("player_key", this.player_key);
 
     //add tracks to the playlist
-    if (this.#playlistDiv) {
+    if (this.#dom.playlistDiv) {
       this.#tracks.forEach((track) => {
         const trackEl = document.createElement("ulut0002-track");
 
@@ -253,7 +256,7 @@ class Player extends HTMLElement {
         trackEl.setAttribute("image", this.#imagePath + track.art_cover);
 
         trackEl.setAttribute("player_key", this.player_key);
-        this.#playlistDiv.append(trackEl);
+        this.#dom.playlistDiv.append(trackEl);
       });
     }
   }

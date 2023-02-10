@@ -421,11 +421,12 @@ template.innerHTML = `
       </slot>
       <div id="artist_name" class="bounce-bottom"></div>
     </div>
-    <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
   </div>
 
 
 `;
+
+// <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
 
 class Preview extends HTMLElement {
   #data = {
@@ -449,7 +450,7 @@ class Preview extends HTMLElement {
     this.#dom.image = this.root.getElementById("artwork");
     this.#dom.artistNameDiv = this.root.getElementById("artist_name");
     this.#dom.trackNameDiv = this.root.getElementById("track_name");
-    this.#dom.controlDiv = this.root.getElementById("controls");
+    // this.#dom.controlDiv = this.root.getElementById("controls");
   }
 
   static get observedAttributes() {
@@ -471,7 +472,7 @@ class Preview extends HTMLElement {
       switch (attrName) {
         case "player_key":
           this.#data.player_key = newVal;
-          this.#dom.controlDiv.setAttribute("player_key", this.player_key);
+          // this.#dom.controlDiv.setAttribute("player_key", this.player_key);
           break;
       }
     }
@@ -527,7 +528,6 @@ class Preview extends HTMLElement {
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
-    this.#dom.controlDiv.setAttribute("player_key", this.player_key);
   }
 }
 
