@@ -1,6 +1,6 @@
 const data = {
-  imagePath: "./img/",
-  mediaPath: "./media/",
+  // imagePath: "./img/",
+  // mediaPath: "./media/",
   tracks: [
     {
       name: "Say Say Say",

@@ -175,7 +175,7 @@ class Player extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["tracks", "imagePath", "trackPath"];
+    return ["tracks", "image", "media"];
   }
 
   //setters and getters
@@ -185,17 +185,17 @@ class Player extends HTMLElement {
   get tracks() {
     return this.getAttribute("tracks");
   }
-  set imagePath(val) {
-    this.setAttribute("imagePath", val);
+  set image(val) {
+    this.setAttribute("image", val);
   }
-  get imagePath() {
-    return this.getAttribute("imagePath");
+  get image() {
+    return this.getAttribute("image");
   }
-  set trackPath(val) {
-    this.setAttribute("trackPath", val);
+  set media(val) {
+    this.setAttribute("media", val);
   }
-  get trackPath() {
-    return this.getAttribute("trackPath");
+  get media() {
+    return this.getAttribute("media");
   }
 
   connectedCallback() {
@@ -203,11 +203,11 @@ class Player extends HTMLElement {
     if (!this.#tracks || !Array.isArray(this.#tracks)) {
       this.#tracks = [];
     }
-    if (this.imagePath && this.imagePath.at(-1) !== "/") {
-      this.imagePath += "/";
+    if (this.#imagePath && this.#imagePath.at(-1) !== "/") {
+      this.#imagePath += "/";
     }
-    if (this.mediaPath && this.mediaPath.at(-1) !== "/") {
-      this.mediaPath += "/";
+    if (this.#mediaPath && this.#mediaPath.at(-1) !== "/") {
+      this.#mediaPath += "/";
     }
 
     document.addEventListener("trackPlayed", (e) => {
@@ -231,7 +231,7 @@ class Player extends HTMLElement {
 
         let subElement = document.createElement("img");
         subElement.slot = "image";
-        subElement.src = this.imagePath + track.thumbnail;
+        subElement.src = this.#imagePath + track.thumbnail;
         subElement.alt = `Album artwork (small) of track ${track.name} by ${track.artist}`;
         trackEl.append(subElement);
 
@@ -259,21 +259,24 @@ class Player extends HTMLElement {
   }
 
   attributeChangedCallback(attrName, oldVal, newVal) {
-    attrName = attrName.toLowerCase().trim();
+    const attrName2 = attrName.toLowerCase().trim();
     if (oldVal != newVal) {
-      switch (attrName) {
+      switch (attrName2) {
         case "tracks":
           try {
             const parsedData = JSON.parse(newVal);
             this.#tracks = parsedData.tracks;
-            this.#imagePath = parsedData.imagePath;
-            this.#mediaPath = parsedData.mediaPath;
           } catch (error) {
             //display an error
             // console.log("tracks cannot be read");
           }
           break;
-
+        case "image":
+          this.#imagePath = newVal;
+          break;
+        case "media":
+          this.#mediaPath = newVal;
+          break;
         default:
           break;
       }
