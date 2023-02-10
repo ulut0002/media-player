@@ -42,7 +42,7 @@ template.innerHTML = `
         margin: 0;
       
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
       
         // background: var(--preview-background);
         // background-image: var(--preview-background-gradient);
@@ -55,10 +55,18 @@ template.innerHTML = `
         
         display: flex;
         flex-direction: column;
-        height: 100%;
-        background-color: var(--track-bg-color);
-        overflow-x: auto;
 
+        // height: calc(100vh-20rem);
+        height: 100%;
+        width: 100%;
+        background-color: var(--track-bg-color);
+        overflow: auto;
+
+      }
+
+      .playlist-wrapper{
+        // overflow: auto;
+        
       }
       
       @media only screen and (min-width: 45rem) {
@@ -89,18 +97,19 @@ template.innerHTML = `
           grid-row: 2 / 3;
           display: flex;
           flex-direction: column;
-      
         }
       
         .playlist {
           grid-column: 2 / 3;
-          grid-row: 2 / 4;
+          grid-row: 2 / 3;
         }
 
         .controls {
           grid-column: 1 / 3;
           grid-row: 3/4;
         }
+
+
       }
       
     
@@ -229,6 +238,10 @@ class Player extends HTMLElement {
 
     //add tracks to the playlist
     if (this.#dom.playlistDiv) {
+      const divEl = document.createElement("div");
+      divEl.classList.add("playlist-wrapper");
+      this.#dom.playlistDiv.append(divEl);
+
       this.#tracks.forEach((track) => {
         const trackEl = document.createElement("ulut0002-track");
 
@@ -256,7 +269,7 @@ class Player extends HTMLElement {
         trackEl.setAttribute("image", this.#imagePath + track.art_cover);
 
         trackEl.setAttribute("player_key", this.player_key);
-        this.#dom.playlistDiv.append(trackEl);
+        divEl.append(trackEl);
       });
     }
   }

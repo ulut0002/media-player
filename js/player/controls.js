@@ -86,7 +86,7 @@ template.innerHTML = `
       </slot>
     </div>
 
-    <ulut0002-volume class="volume"></ulut0002-volume>
+    // <ulut0002-volume class="volume"></ulut0002-volume>
 </div>
 
 

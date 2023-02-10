@@ -14,6 +14,10 @@ template.innerHTML = `
         display: block;
         font-family: var(--font-family);
         color: var(--text-color);
+        flex-basis: 0;
+        flex-grow: 1; 
+        flex: 1;
+        
     }
 
     .track{
