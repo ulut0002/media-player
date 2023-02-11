@@ -284,6 +284,7 @@ class Track extends HTMLElement {
       } else {
         // if the track catches this event, and it is not the current track,
         //then it goes back to the beginning of the track
+        this.#data.activeTrack = false;
         if (this.#timerInterval) {
           clearInterval(this.#timerInterval);
         }
