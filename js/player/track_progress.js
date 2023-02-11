@@ -204,11 +204,14 @@ class TrackProgress extends HTMLElement {
   }
 
   firePositionChangeEvent() {
+    // console.log("here");
     const event = trackPositionChanged(
       this.#data.player_key,
       this.#data.currentPosition
     );
     if (event) {
+      // console.log(event.type, event.detail);
+
       document.dispatchEvent(event);
     }
   }
