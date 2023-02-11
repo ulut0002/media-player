@@ -68,11 +68,11 @@ template.innerHTML = `
         skip_previous
       </span>
 
-      <span class="material-symbols-outlined player-control-icon center" id="play_track" title="Press to pause">
+      <span class="material-symbols-outlined player-control-icon center" id="play_track" title="Press to play">
         play_circle
       </span>
 
-      <span class="material-symbols-outlined player-control-icon hide" id="pause_track" title="Press to play">
+      <span class="material-symbols-outlined player-control-icon hide" id="pause_track" title="Press to pause">
         pause_circle
       </span>
 
@@ -126,7 +126,6 @@ class Controls extends HTMLElement {
 
     this.#dom.progressEl = this.root.getElementById("progress");
 
-    console.log("this.#dom.containerDiv", this.#dom.containerDiv);
     if (this.#dom.containerDiv) {
       // this.#dom.containerDiv.addEventListener("click", (ev) => {
       //   this.handleClick.call(this, ev);
@@ -200,12 +199,14 @@ class Controls extends HTMLElement {
 
     document.addEventListener(
       `track-play-status-${this.#data.player_key}`,
+
       this.handlePlayerStatus.bind(this)
     );
 
-    document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
-      // console.log("Controls: ", ev.detail);
-    });
+    document.addEventListener(
+      `play-track-${this.#data.player_key}`,
+      (ev) => {}
+    );
   }
 
   handlePlayerStatus(ev) {
@@ -223,10 +224,7 @@ class Controls extends HTMLElement {
       player_key: this.#data.player_key,
       action: "PAUSE",
     });
-    // console.log("pause track", event.type, event.detail);
     document.dispatchEvent(event);
-    this.#dom.btnPlayTrack.classList.toggle("hide");
-    this.#dom.btnPauseTrack.classList.toggle("hide");
   }
 
   playTrack() {
@@ -236,9 +234,6 @@ class Controls extends HTMLElement {
     });
 
     document.dispatchEvent(event);
-
-    this.#dom.btnPlayTrack.classList.toggle("hide");
-    this.#dom.btnPauseTrack.classList.toggle("hide");
   }
 
   skipPrevious() {}

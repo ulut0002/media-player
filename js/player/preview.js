@@ -517,7 +517,6 @@ class Preview extends HTMLElement {
   }
 
   connectedCallback() {
-    // console.log("inside connected call back", this.#data.player_key);
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
@@ -525,7 +524,6 @@ class Preview extends HTMLElement {
     document.addEventListener(
       `preview-track-${this.#data.player_key}`,
       (ev) => {
-        console.log("preview track caught");
         this.replaceImage.call(this, ev.detail);
       }
     );

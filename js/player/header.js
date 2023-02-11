@@ -333,10 +333,7 @@ class Header extends HTMLElement {
   connectedCallback() {
     let hostStyle = null;
     const rules = this.root.styleSheets[0].rules;
-    // console.log(rules[1]["selectorText"]);
     for (const rule of rules) {
-      // console.log(`Rule: `, rule);
-
       if (rule["selectorText"]?.toString().toLowerCase() === ":host") {
         hostStyle = rule;
         break;

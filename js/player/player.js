@@ -223,17 +223,7 @@ class Player extends HTMLElement {
     }
     this.#dom.controlDiv.setAttribute("player_key", this.player_key);
 
-    document.addEventListener("trackPlayed", (e) => {
-      // console.log("track playing ", e.detail);
-    });
-
     this.buildPlayer();
-
-    // add event
-    document.addEventListener(
-      `player-event-${this.player_key}`,
-      this.handlePlayerEvent.bind(this)
-    );
   }
 
   disconnectedCallback() {
@@ -277,6 +267,7 @@ class Player extends HTMLElement {
 
         trackEl.setAttribute("player_key", this.player_key);
         divEl.append(trackEl);
+
         if (!firstTrackID) {
           firstTrackID = trackEl.getTrackID();
         }
@@ -303,7 +294,6 @@ class Player extends HTMLElement {
             this.#tracks = parsedData.tracks;
           } catch (error) {
             //display an error
-            // console.log("tracks cannot be read");
           }
           break;
         case "image":
@@ -318,9 +308,7 @@ class Player extends HTMLElement {
     }
   }
 
-  async handlePlayerEvent(ev) {
-    console.log(ev.detail);
-  }
+  async handlePlayerEvent(ev) {}
 }
 
 customElements.define("ulut0002-player", Player);

@@ -290,8 +290,8 @@ class Track extends HTMLElement {
         if (this.#data.audio && !this.#data.audio.paused) {
           this.#data.audio.pause();
           this.#data.audio.currentTime = 0;
-          this.#headerDiv.classList.remove("playing");
         }
+        this.#headerDiv.classList.remove("playing");
       }
 
       document.addEventListener(
@@ -321,7 +321,6 @@ class Track extends HTMLElement {
     document.addEventListener(
       `set-current-track-${this.#data.player_key}`,
       (ev) => {
-        console.log("First track: ", ev.detail.track_id);
         if (ev.detail.track_id === this.#data.id) {
           //
           this.#data.activeTrack = true;
@@ -334,7 +333,6 @@ class Track extends HTMLElement {
             artist: this.#data.artist,
             name: this.#data.name,
           });
-          console.log("event detail on load: ", event.type);
           if (event) {
             setTimeout(() => {
               document.dispatchEvent(event);
@@ -350,6 +348,11 @@ class Track extends HTMLElement {
         this.#data.audio.addEventListener("loadedmetadata", () => {
           this.handleDurationRetrieval.call(this);
         });
+
+        this.#data.audio.addEventListener(
+          "ended",
+          this.handleAudioEnded.bind(this)
+        );
       }
     }
 
@@ -362,6 +365,16 @@ class Track extends HTMLElement {
         }
       });
     }
+  }
+
+  handleAudioEnded(ev) {
+    this.#data.audio.currentTime = 0;
+    this.#data.audio.pause();
+    // if (options.full) this.#headerDiv.classList.remove("playing");
+    if (this.#timerInterval) {
+      clearInterval(this.#timerInterval);
+    }
+    this.handleOnTimeUpdate();
   }
 
   pausePlayCurrentTrack(options = { full: false }) {
@@ -415,10 +428,8 @@ class Track extends HTMLElement {
   }
 
   handleOnTimeUpdate() {
-    // console.log("currentTime", this.#data.audio.currentTime);
     //fire trigger for control
 
-    // console.log(`inside handleOnTimeUpdate for ${this.#data.name}`);
     if (this.#data.pauseOnTimeUpdate) return;
 
     const event = trackIsPlaying(

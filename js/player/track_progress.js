@@ -157,7 +157,6 @@ class TrackProgress extends HTMLElement {
           document.addEventListener(
             `track-is-playing-${this.#data.player_key}`,
             (ev) => {
-              // console.log(ev.detail);
               if (this.#dom.range) {
                 this.#dom.range.value = Math.floor(ev.detail.percentage);
               }
@@ -195,7 +194,6 @@ class TrackProgress extends HTMLElement {
   handleRangeChange(ev) {
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
-    // console.log("track is ", i);
     this.#data.currentPosition = i;
     this.firePositionChangeEvent();
 
