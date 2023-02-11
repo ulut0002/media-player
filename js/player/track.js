@@ -294,21 +294,21 @@ class Track extends HTMLElement {
         }
         this.#headerDiv.classList.remove("playing");
       }
-
-      document.addEventListener(
-        `pause-on-timer-update-${this.#data.player_key}`,
-        (ev) => {
-          this.#data.pauseOnTimeUpdate = ev.detail.enable;
-        }
-      );
-
-      document.addEventListener(
-        `seek-position-${this.#data.player_key}`,
-        (ev) => {
-          this.seekPosition.call(this, ev.detail);
-        }
-      );
     });
+    document.addEventListener(
+      `pause-on-timer-update-${this.#data.player_key}`,
+      (ev) => {
+        this.#data.pauseOnTimeUpdate = ev.detail.enable;
+      }
+    );
+
+    document.addEventListener(
+      `seek-position-${this.#data.player_key}`,
+      (ev) => {
+        // console.log("here");
+        this.seekPosition.call(this, ev.detail);
+      }
+    );
 
     document.addEventListener(
       `control-track-event-${this.#data.player_key}`,
@@ -384,14 +384,12 @@ class Track extends HTMLElement {
       if (options.full) this.#headerDiv.classList.add("playing");
 
       const event = currentMediaChangeEvent(this.#data.player_key, true);
-      if (event) {
-        document.dispatchEvent(event);
-      }
+      if (event) document.dispatchEvent(event);
 
-      this.#timerInterval = setInterval(
-        this.handleOnTimeUpdate.bind(this),
-        1000
-      ); // every second
+      // every second
+      this.#timerInterval = setInterval(() => {
+        this.handleOnTimeUpdate();
+      }, 1000);
     } else {
       this.#data.audio.pause();
       if (options.full) this.#headerDiv.classList.remove("playing");
