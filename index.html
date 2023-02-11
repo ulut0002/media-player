@@ -6,16 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Serdar's Media Player</title>
 
-    <!-- Fav icon: https://www.flaticon.com/free-icon/musical-note_2898875?term=music+notes&page=1&position=92&origin=search&related_id=2898875 -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
-
     <script src="./js/player/player.js" type="module" defer></script>
     <script src="./js/app.js" type="module" defer></script>
-    <link rel="stylesheet" href="./css/style.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
-    />
+
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src  'self'; 
@@ -23,8 +16,16 @@
            script-src 'self' 'unsafe-inline';
            style-src 'self' 'unsafe-inline' *.googleapis.com *.jsdelivr.net;
            font-src 'self' fonts.gstatic.com *.jsdelivr.net;
-           connect-src 'self' *.github.com;"
+           connect-src 'self' *.github.com;
+           media-src 'self' *.github.com;"
     />
+    <!-- Fav icon: https://www.flaticon.com/free-icon/musical-note_2898875?term=music+notes&page=1&position=92&origin=search&related_id=2898875 -->
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=2" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
     <div id="player-container" class="player-container"></div>

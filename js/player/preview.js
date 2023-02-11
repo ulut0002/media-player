@@ -421,15 +421,17 @@ template.innerHTML = `
       </slot>
       <div id="artist_name" class="bounce-bottom"></div>
     </div>
-    <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
   </div>
 
 
 `;
 
+// <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
+
 class Preview extends HTMLElement {
   #data = {
     player_key: null,
+    track_id: null,
   };
 
   #dom = {
@@ -449,7 +451,7 @@ class Preview extends HTMLElement {
     this.#dom.image = this.root.getElementById("artwork");
     this.#dom.artistNameDiv = this.root.getElementById("artist_name");
     this.#dom.trackNameDiv = this.root.getElementById("track_name");
-    this.#dom.controlDiv = this.root.getElementById("controls");
+    // this.#dom.controlDiv = this.root.getElementById("controls");
   }
 
   static get observedAttributes() {
@@ -471,28 +473,20 @@ class Preview extends HTMLElement {
       switch (attrName) {
         case "player_key":
           this.#data.player_key = newVal;
-          this.#dom.controlDiv.setAttribute("player_key", this.player_key);
+          // this.#dom.controlDiv.setAttribute("player_key", this.player_key);
           break;
       }
     }
   }
 
   async replaceImage(ev) {
-    /*
-    TODO: 
+    //no need to replace the image if it is the same track.
+    if (this.#data.track_id === ev.id) return;
 
-      val 1:  ./img/paul_mccartney_michael_jackson_say_say_say.jpeg 
-      val 2:  http://127.0.0.1:5501/img/paul_mccartney_michael_jackson_say_say_say.jpeg
-
-     must find a way to match them
-    */
-    if (ev.image.toLowerCase() == this.#dom.image.src.toLowerCase()) {
-      // console.log("caught");
-      return;
-    }
     // return;
     this.#dom.artistNameDiv.innerHTML = "";
     this.#dom.trackNameDiv.innerHTML = "";
+    this.#data.track_id = ev.id;
 
     this.#dom.image.classList.remove("swirl-in-fwd");
     this.#dom.image.animationPlayState = "running";
@@ -523,11 +517,16 @@ class Preview extends HTMLElement {
   }
 
   connectedCallback() {
-    // console.log("inside connected call back", this.#data.player_key);
     document.addEventListener(`play-track-${this.#data.player_key}`, (ev) => {
       this.replaceImage.call(this, ev.detail);
     });
-    this.#dom.controlDiv.setAttribute("player_key", this.player_key);
+
+    document.addEventListener(
+      `preview-track-${this.#data.player_key}`,
+      (ev) => {
+        this.replaceImage.call(this, ev.detail);
+      }
+    );
   }
 }
 

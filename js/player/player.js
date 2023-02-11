@@ -6,6 +6,7 @@ import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
 
 import { generateRandomString } from "./util.js";
+import { setCurrentTrackEvent } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -42,7 +43,7 @@ template.innerHTML = `
         margin: 0;
       
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
       
         // background: var(--preview-background);
         // background-image: var(--preview-background-gradient);
@@ -55,8 +56,18 @@ template.innerHTML = `
         
         display: flex;
         flex-direction: column;
+
+        // height: calc(100vh-20rem);
         height: 100%;
+        width: 100%;
         background-color: var(--track-bg-color);
+        overflow: auto;
+
+      }
+
+      .playlist-wrapper{
+        // overflow: auto;
+        
       }
       
       @media only screen and (min-width: 45rem) {
@@ -87,17 +98,19 @@ template.innerHTML = `
           grid-row: 2 / 3;
           display: flex;
           flex-direction: column;
-      
         }
       
         .playlist {
           grid-column: 2 / 3;
-          grid-row: 2 / 4;
-          
-          
- 
-
+          grid-row: 2 / 3;
         }
+
+        .controls {
+          grid-column: 1 / 3;
+          grid-row: 3/4;
+        }
+
+
       }
       
     
@@ -117,6 +130,7 @@ template.innerHTML = `
       </div>
 
       <div id="playlist" class="playlist"></div>
+      <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
     </div>
 
 
@@ -140,12 +154,14 @@ class Player extends HTMLElement {
   #imagePath = "";
   #mediaPath = "";
 
-  #currentTrack = undefined;
-  #playerDiv = undefined;
-  #playlistDiv = undefined;
-  #headerDiv = undefined;
-  #previewDiv = undefined;
-  #controlDiv = undefined;
+  // dom elements
+  #dom = {
+    playerDiv: null,
+    playlistDiv: null,
+    headerDiv: null,
+    controlDiv: null,
+    previewDiv: null,
+  };
 
   constructor() {
     super();
@@ -158,21 +174,20 @@ class Player extends HTMLElement {
 
     if (!this.player_key) {
       this.player_key = generateRandomString(10);
-      // console.log(this.player_key);
     }
 
-    this.#playerDiv = this.root.getElementById("player");
-    this.#playlistDiv = this.root.getElementById("playlist");
-    this.#headerDiv = this.root.getElementById("header");
+    this.#dom.playerDiv = this.root.getElementById("player");
+    this.#dom.playlistDiv = this.root.getElementById("playlist");
+    this.#dom.headerDiv = this.root.getElementById("header");
+    this.#dom.controlDiv = this.root.getElementById("controls");
 
-    this.#previewDiv = this.root
+    this.#dom.previewDiv = this.root
       .getElementById("preview")
       .querySelector("ulut0002-preview");
-    // console.log(this.#headerDiv);
   }
 
   static get observedAttributes() {
-    return ["tracks", "imagePath", "trackPath"];
+    return ["tracks", "image", "media"];
   }
 
   //setters and getters
@@ -182,17 +197,17 @@ class Player extends HTMLElement {
   get tracks() {
     return this.getAttribute("tracks");
   }
-  set imagePath(val) {
-    this.setAttribute("imagePath", val);
+  set image(val) {
+    this.setAttribute("image", val);
   }
-  get imagePath() {
-    return this.getAttribute("imagePath");
+  get image() {
+    return this.getAttribute("image");
   }
-  set trackPath(val) {
-    this.setAttribute("trackPath", val);
+  set media(val) {
+    this.setAttribute("media", val);
   }
-  get trackPath() {
-    return this.getAttribute("trackPath");
+  get media() {
+    return this.getAttribute("media");
   }
 
   connectedCallback() {
@@ -200,16 +215,13 @@ class Player extends HTMLElement {
     if (!this.#tracks || !Array.isArray(this.#tracks)) {
       this.#tracks = [];
     }
-    if (this.imagePath && this.imagePath.at(-1) !== "/") {
-      this.imagePath += "/";
+    if (this.#imagePath && this.#imagePath.at(-1) !== "/") {
+      this.#imagePath += "/";
     }
-    if (this.mediaPath && this.mediaPath.at(-1) !== "/") {
-      this.mediaPath += "/";
+    if (this.#mediaPath && this.#mediaPath.at(-1) !== "/") {
+      this.#mediaPath += "/";
     }
-
-    document.addEventListener("trackPlayed", (e) => {
-      // console.log("track playing ", e.detail);
-    });
+    this.#dom.controlDiv.setAttribute("player_key", this.player_key);
 
     this.buildPlayer();
   }
@@ -219,16 +231,20 @@ class Player extends HTMLElement {
   }
 
   buildPlayer() {
-    this.#previewDiv.setAttribute("player_key", this.player_key);
-
+    this.#dom.previewDiv.setAttribute("player_key", this.player_key);
+    let firstTrackID = "";
     //add tracks to the playlist
-    if (this.#playlistDiv) {
+    if (this.#dom.playlistDiv) {
+      const divEl = document.createElement("div");
+      divEl.classList.add("playlist-wrapper");
+      this.#dom.playlistDiv.append(divEl);
+
       this.#tracks.forEach((track) => {
         const trackEl = document.createElement("ulut0002-track");
 
         let subElement = document.createElement("img");
         subElement.slot = "image";
-        subElement.src = this.imagePath + track.thumbnail;
+        subElement.src = this.#imagePath + track.thumbnail;
         subElement.alt = `Album artwork (small) of track ${track.name} by ${track.artist}`;
         trackEl.append(subElement);
 
@@ -250,32 +266,49 @@ class Player extends HTMLElement {
         trackEl.setAttribute("image", this.#imagePath + track.art_cover);
 
         trackEl.setAttribute("player_key", this.player_key);
-        this.#playlistDiv.append(trackEl);
+        divEl.append(trackEl);
+
+        if (!firstTrackID) {
+          firstTrackID = trackEl.getTrackID();
+        }
       });
+    }
+
+    if (firstTrackID) {
+      //dispatch event
+      const event = setCurrentTrackEvent({
+        player_key: this.player_key,
+        track_id: firstTrackID,
+      });
+      document.dispatchEvent(event);
     }
   }
 
   attributeChangedCallback(attrName, oldVal, newVal) {
-    attrName = attrName.toLowerCase().trim();
+    const attrName2 = attrName.toLowerCase().trim();
     if (oldVal != newVal) {
-      switch (attrName) {
+      switch (attrName2) {
         case "tracks":
           try {
             const parsedData = JSON.parse(newVal);
             this.#tracks = parsedData.tracks;
-            this.#imagePath = parsedData.imagePath;
-            this.#mediaPath = parsedData.mediaPath;
           } catch (error) {
             //display an error
-            // console.log("tracks cannot be read");
           }
           break;
-
+        case "image":
+          this.#imagePath = newVal;
+          break;
+        case "media":
+          this.#mediaPath = newVal;
+          break;
         default:
           break;
       }
     }
   }
+
+  async handlePlayerEvent(ev) {}
 }
 
 customElements.define("ulut0002-player", Player);

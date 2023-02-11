@@ -1,5 +1,6 @@
 import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
+import { controlTrackEvent } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -33,7 +34,7 @@ template.innerHTML = `
         flex-direction: row;
         gap: 0.25rem;
         align-items: center;
-        margin: 0.75rem 0;
+        margin: 1.50rem 0;
       }
       
       .volume {
@@ -67,11 +68,11 @@ template.innerHTML = `
         skip_previous
       </span>
 
-      <span class="material-symbols-outlined player-control-icon center" id="play_track" title="Press to pause">
+      <span class="material-symbols-outlined player-control-icon center" id="play_track" title="Press to play">
         play_circle
       </span>
 
-      <span class="material-symbols-outlined player-control-icon hide" id="pause_track" title="Press to play">
+      <span class="material-symbols-outlined player-control-icon hide" id="pause_track" title="Press to pause">
         pause_circle
       </span>
 
@@ -86,7 +87,7 @@ template.innerHTML = `
       </slot>
     </div>
 
-    <ulut0002-volume class="volume"></ulut0002-volume>
+
 </div>
 
 
@@ -126,31 +127,35 @@ class Controls extends HTMLElement {
     this.#dom.progressEl = this.root.getElementById("progress");
 
     if (this.#dom.containerDiv) {
-      this.#dom.containerDiv.addEventListener("click", (ev) => {
-        this.handleClick.call(this, ev);
-      });
+      // this.#dom.containerDiv.addEventListener("click", (ev) => {
+      //   this.handleClick.call(this, ev);
+      // });
+
+      this.#dom.containerDiv.addEventListener(
+        "click",
+        this.handleClick.bind(this)
+      );
     }
   }
 
   handleClick(ev) {
     const id = ev.target.id.toLowerCase();
+
     switch (id) {
       case "play_track":
-        this.pauseTrack(ev);
-
+        this.playTrack();
         break;
       case "pause_track":
-        this.playTrack(ev);
+        this.pauseTrack();
         break;
       case "shuffle":
-        this.shuffle(ev);
+        this.shuffle();
         break;
-
       case "repeat":
-        this.repeat(ev);
+        this.repeat();
         break;
       case "repeat_one":
-        this.repeatOne(ev);
+        this.repeatOne();
         break;
 
       default:
@@ -191,35 +196,63 @@ class Controls extends HTMLElement {
   connectedCallback() {
     if (this.#dom.progressEl)
       this.#dom.progressEl.player_key = this.#data.player_key;
+
+    document.addEventListener(
+      `track-play-status-${this.#data.player_key}`,
+
+      this.handlePlayerStatus.bind(this)
+    );
+
+    document.addEventListener(
+      `play-track-${this.#data.player_key}`,
+      (ev) => {}
+    );
   }
 
-  pauseTrack(ev) {
-    this.#dom.btnPlayTrack.classList.toggle("hide");
-    this.#dom.btnPauseTrack.classList.toggle("hide");
+  handlePlayerStatus(ev) {
+    if (ev.detail.playing) {
+      this.#dom.btnPlayTrack.classList.add("hide");
+      this.#dom.btnPauseTrack.classList.remove("hide");
+    } else {
+      this.#dom.btnPlayTrack.classList.remove("hide");
+      this.#dom.btnPauseTrack.classList.add("hide");
+    }
   }
 
-  playTrack(ev) {
-    this.#dom.btnPlayTrack.classList.toggle("hide");
-    this.#dom.btnPauseTrack.classList.toggle("hide");
+  pauseTrack() {
+    const event = controlTrackEvent({
+      player_key: this.#data.player_key,
+      action: "PAUSE",
+    });
+    document.dispatchEvent(event);
+  }
+
+  playTrack() {
+    const event = controlTrackEvent({
+      player_key: this.#data.player_key,
+      action: "PLAY",
+    });
+
+    document.dispatchEvent(event);
   }
 
   skipPrevious() {}
 
   skipNext() {}
 
-  shuffle(ev) {
+  shuffle() {
     this.#dom.btnShuffle.classList.add("hide");
     this.#dom.btnRepeat.classList.remove("hide");
     this.#dom.btnRepeatOne.classList.add("hide");
   }
 
-  repeat(ev) {
+  repeat() {
     this.#dom.btnShuffle.classList.add("hide");
     this.#dom.btnRepeat.classList.add("hide");
     this.#dom.btnRepeatOne.classList.remove("hide");
   }
 
-  repeatOne(ev) {
+  repeatOne() {
     this.#dom.btnShuffle.classList.remove("hide");
     this.#dom.btnRepeat.classList.add("hide");
     this.#dom.btnRepeatOne.classList.add("hide");
