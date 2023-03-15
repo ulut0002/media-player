@@ -311,6 +311,16 @@ class Track extends HTMLElement {
     );
 
     document.addEventListener(
+      `play-track-by-id-${this.#data.player_key}`,
+      (ev) => {
+        if (!ev.detail.id) return;
+        if (ev.detail.id === this.#data.id) {
+          this.handleTrackClick.call(this, this.#data);
+        }
+      }
+    );
+
+    document.addEventListener(
       `control-track-event-${this.#data.player_key}`,
       (ev) => {
         if (this.#data.activeTrack) {

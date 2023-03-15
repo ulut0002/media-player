@@ -29,6 +29,15 @@ function playEvent(trackObj) {
   return createEvent(type, data);
 }
 
+//User clicks on play button on playlist
+function playEventById(trackObj) {
+  const type = `play-track-by-id-${trackObj.player_key}`;
+  const data = {
+    id: trackObj.id,
+  };
+  return createEvent(type, data);
+}
+
 function playNext(obj) {
   const type = `play-next-${obj.player_key}`;
   const data = {};
@@ -141,4 +150,5 @@ export {
   previewEvent,
   playNext,
   playPrevious,
+  playEventById,
 };

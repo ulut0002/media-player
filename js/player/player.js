@@ -6,7 +6,7 @@ import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
 
 import { generateRandomString } from "./util.js";
-import { setCurrentTrackEvent } from "./player-event.js";
+import { setCurrentTrackEvent, playEventById } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -274,7 +274,7 @@ class Player extends HTMLElement {
         if (!firstTrackID) {
           firstTrackID = trackEl.getTrackID();
         }
-        this.#tracks.push(trackEl.getTrackID);
+        this.#tracks.push(trackEl.getTrackID());
       });
     }
 
@@ -292,12 +292,45 @@ class Player extends HTMLElement {
     this.#currentTrackID = data.id;
   }
 
+  getCurrentTrackIndex() {
+    if (!this.#currentTrackID) return 0;
+
+    const idx = this.#tracks.findIndex(
+      (track) => track == this.#currentTrackID
+    );
+    return idx;
+  }
+
   playNextTrack() {
-    console.log("play next");
+    let currentTrackIdx = this.getCurrentTrackIndex();
+    let nextTrackIdx = currentTrackIdx + 1;
+    if (nextTrackIdx >= this.#tracks.length) {
+      nextTrackIdx = 0;
+    }
+
+    const nextTrack = this.#tracks.at(nextTrackIdx);
+    this.firePlayTrackEvent(nextTrack);
   }
 
   playPreviousTrack() {
-    console.log("play previous");
+    let currentTrackIdx = this.getCurrentTrackIndex();
+    let nextTrackIdx = currentTrackIdx - 1;
+    if (nextTrackIdx < 0) {
+      nextTrackIdx = this.#tracks.length - 1;
+    }
+
+    const nextTrack = this.#tracks.at(nextTrackIdx);
+    this.firePlayTrackEvent(nextTrack);
+  }
+
+  firePlayTrackEvent(trackID) {
+    if (!trackID) return;
+    console.log("here");
+    const event = playEventById({
+      player_key: this.player_key,
+      id: trackID,
+    });
+    document.dispatchEvent(event);
   }
 
   addEventListeners() {
