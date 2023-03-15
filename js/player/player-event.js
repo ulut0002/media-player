@@ -32,9 +32,7 @@ function playEvent(trackObj) {
 //User clicks on play button on playlist
 function playEventById(trackObj) {
   const type = `play-track-by-id-${trackObj.player_key}`;
-  const data = {
-    id: trackObj.id,
-  };
+  const data = trackObj;
   return createEvent(type, data);
 }
 

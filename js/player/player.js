@@ -325,7 +325,7 @@ class Player extends HTMLElement {
 
   firePlayTrackEvent(trackID) {
     if (!trackID) return;
-    console.log("here");
+    // console.log("here");
     const event = playEventById({
       player_key: this.player_key,
       id: trackID,
