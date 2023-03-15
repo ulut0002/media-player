@@ -1,6 +1,6 @@
 import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
-import { controlTrackEvent } from "./player-event.js";
+import { controlTrackEvent, playNext, playPrevious } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -142,6 +142,13 @@ class Controls extends HTMLElement {
     const id = ev.target.id.toLowerCase();
 
     switch (id) {
+      case "skip_previous":
+        //fire event
+        this.skipPrevious();
+        break;
+      case "skip_next":
+        this.skipNext();
+        break;
       case "play_track":
         this.playTrack();
         break;
@@ -236,9 +243,21 @@ class Controls extends HTMLElement {
     document.dispatchEvent(event);
   }
 
-  skipPrevious() {}
+  skipPrevious() {
+    const event = playPrevious({
+      player_key: this.#data.player_key,
+    });
 
-  skipNext() {}
+    document.dispatchEvent(event);
+  }
+
+  skipNext() {
+    const event = playNext({
+      player_key: this.#data.player_key,
+    });
+
+    document.dispatchEvent(event);
+  }
 
   shuffle() {
     this.#dom.btnShuffle.classList.add("hide");

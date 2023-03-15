@@ -29,6 +29,18 @@ function playEvent(trackObj) {
   return createEvent(type, data);
 }
 
+function playNext(obj) {
+  const type = `play-next-${obj.player_key}`;
+  const data = {};
+  return createEvent(type, data);
+}
+
+function playPrevious(obj) {
+  const type = `play-previous-${obj.player_key}`;
+  const data = {};
+  return createEvent(type, data);
+}
+
 //User clicks on play button on playlist
 function previewEvent(trackObj) {
   const type = `preview-track-${trackObj.player_key}`;
@@ -127,4 +139,6 @@ export {
   currentMediaChangeEvent,
   setCurrentTrackEvent,
   previewEvent,
+  playNext,
+  playPrevious,
 };

@@ -289,12 +289,28 @@ class Player extends HTMLElement {
   }
 
   handlePlayTrackEvent(data) {
-    console.log(data);
+    this.#currentTrackID = data.id;
+  }
+
+  playNextTrack() {
+    console.log("play next");
+  }
+
+  playPreviousTrack() {
+    console.log("play previous");
   }
 
   addEventListeners() {
     document.addEventListener(`play-track-${this.player_key}`, (ev) => {
       this.handlePlayTrackEvent.call(this, ev.detail);
+    });
+
+    document.addEventListener(`play-previous-${this.player_key}`, (ev) => {
+      this.playPreviousTrack.call(this);
+    });
+
+    document.addEventListener(`play-next-${this.player_key}`, (ev) => {
+      this.playNextTrack.call(this);
     });
   }
 
