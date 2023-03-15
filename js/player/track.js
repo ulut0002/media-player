@@ -4,6 +4,7 @@ import {
   trackIsPlaying,
   currentMediaChangeEvent,
   previewEvent,
+  playNext,
 } from "./player-event.js";
 import Player from "./player.js";
 
@@ -288,17 +289,31 @@ class Track extends HTMLElement {
         if (this.#timerInterval) {
           clearInterval(this.#timerInterval);
         }
-        if (this.#data.audio && !this.#data.audio.paused) {
-          this.#data.audio.pause();
+        if (this.#data.audio) {
+          if (!this.#data.audio.paused) {
+            this.#data.audio.pause();
+          }
           this.#data.audio.currentTime = 0;
         }
         this.#headerDiv.classList.remove("playing");
       }
     });
+
+    document.addEventListener(
+      `play-track-by-id-${this.#data.player_key}`,
+      (ev) => {
+        if (ev.detail.id === this.#data.id) {
+          this.handleTrackClick.call(this, this.#data);
+        }
+      }
+    );
+
     document.addEventListener(
       `pause-on-timer-update-${this.#data.player_key}`,
       (ev) => {
-        this.#data.pauseOnTimeUpdate = ev.detail.enable;
+        if (this.#data.activeTrack) {
+          this.#data.pauseOnTimeUpdate = ev.detail.enable;
+        }
       }
     );
 
@@ -306,7 +321,9 @@ class Track extends HTMLElement {
       `seek-position-${this.#data.player_key}`,
       (ev) => {
         // console.log("here");
-        this.seekPosition.call(this, ev.detail);
+        if (this.#data.activeTrack) {
+          this.seekPosition.call(this, ev.detail);
+        }
       }
     );
 
@@ -369,13 +386,13 @@ class Track extends HTMLElement {
   }
 
   handleAudioEnded(ev) {
-    this.#data.audio.currentTime = 0;
     this.#data.audio.pause();
-    // if (options.full) this.#headerDiv.classList.remove("playing");
-    if (this.#timerInterval) {
-      clearInterval(this.#timerInterval);
-    }
+    this.#data.audio.currentTime = 0;
+    if (this.#timerInterval) clearInterval(this.#timerInterval);
     this.handleOnTimeUpdate();
+
+    // play next song
+    document.dispatchEvent(playNext(this.#data));
   }
 
   pausePlayCurrentTrack(options = { full: false }) {
@@ -411,10 +428,7 @@ class Track extends HTMLElement {
   // Multiple components catch the event.
   // Play event is: play-track-${trackObj.player_key}
   handlePlayButton(selectedTrack) {
-    const event = playEvent(selectedTrack);
-    if (event) {
-      document.dispatchEvent(event);
-    }
+    document.dispatchEvent(playEvent(selectedTrack));
   }
 
   // The track's duration is retrieved, formatted and displayed on the screen

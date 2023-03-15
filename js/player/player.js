@@ -6,7 +6,7 @@ import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
 
 import { generateRandomString } from "./util.js";
-import { setCurrentTrackEvent } from "./player-event.js";
+import { setCurrentTrackEvent, playEventById } from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -150,7 +150,9 @@ template.innerHTML = `
 
 class Player extends HTMLElement {
   #player_key = null;
-  #tracks = []; //each item represents a track object.
+  #tracksData = []; //each item represents a track object.
+  #tracks = []; //an array to represent track ids.
+  #currentTrackID; //represents current track id.. must be within #tracks
   #imagePath = "";
   #mediaPath = "";
 
@@ -212,8 +214,8 @@ class Player extends HTMLElement {
 
   connectedCallback() {
     //set defaults, fix params
-    if (!this.#tracks || !Array.isArray(this.#tracks)) {
-      this.#tracks = [];
+    if (!this.#tracksData || !Array.isArray(this.#tracksData)) {
+      this.#tracksData = [];
     }
     if (this.#imagePath && this.#imagePath.at(-1) !== "/") {
       this.#imagePath += "/";
@@ -224,6 +226,7 @@ class Player extends HTMLElement {
     this.#dom.controlDiv.setAttribute("player_key", this.player_key);
 
     this.buildPlayer();
+    this.addEventListeners();
   }
 
   disconnectedCallback() {
@@ -239,7 +242,7 @@ class Player extends HTMLElement {
       divEl.classList.add("playlist-wrapper");
       this.#dom.playlistDiv.append(divEl);
 
-      this.#tracks.forEach((track) => {
+      this.#tracksData.forEach((track) => {
         const trackEl = document.createElement("ulut0002-track");
 
         let subElement = document.createElement("img");
@@ -271,6 +274,7 @@ class Player extends HTMLElement {
         if (!firstTrackID) {
           firstTrackID = trackEl.getTrackID();
         }
+        this.#tracks.push(trackEl.getTrackID());
       });
     }
 
@@ -284,6 +288,65 @@ class Player extends HTMLElement {
     }
   }
 
+  handlePlayTrackEvent(data) {
+    this.#currentTrackID = data.id;
+  }
+
+  getCurrentTrackIndex() {
+    if (!this.#currentTrackID) return 0;
+
+    const idx = this.#tracks.findIndex(
+      (track) => track == this.#currentTrackID
+    );
+    return idx;
+  }
+
+  playNextTrack() {
+    let currentTrackIdx = this.getCurrentTrackIndex();
+    let nextTrackIdx = currentTrackIdx + 1;
+    if (nextTrackIdx >= this.#tracks.length) {
+      nextTrackIdx = 0;
+    }
+
+    const nextTrack = this.#tracks.at(nextTrackIdx);
+    this.firePlayTrackEvent(nextTrack);
+  }
+
+  playPreviousTrack() {
+    let currentTrackIdx = this.getCurrentTrackIndex();
+    let nextTrackIdx = currentTrackIdx - 1;
+    if (nextTrackIdx < 0) {
+      nextTrackIdx = this.#tracks.length - 1;
+    }
+
+    const nextTrack = this.#tracks.at(nextTrackIdx);
+    this.firePlayTrackEvent(nextTrack);
+  }
+
+  firePlayTrackEvent(trackID) {
+    if (!trackID) return;
+    // console.log("here");
+    const event = playEventById({
+      player_key: this.player_key,
+      id: trackID,
+    });
+    document.dispatchEvent(event);
+  }
+
+  addEventListeners() {
+    document.addEventListener(`play-track-${this.player_key}`, (ev) => {
+      this.handlePlayTrackEvent.call(this, ev.detail);
+    });
+
+    document.addEventListener(`play-previous-${this.player_key}`, (ev) => {
+      this.playPreviousTrack.call(this);
+    });
+
+    document.addEventListener(`play-next-${this.player_key}`, (ev) => {
+      this.playNextTrack.call(this);
+    });
+  }
+
   attributeChangedCallback(attrName, oldVal, newVal) {
     const attrName2 = attrName.toLowerCase().trim();
     if (oldVal != newVal) {
@@ -291,7 +354,7 @@ class Player extends HTMLElement {
         case "tracks":
           try {
             const parsedData = JSON.parse(newVal);
-            this.#tracks = parsedData.tracks;
+            this.#tracksData = parsedData.tracks;
           } catch (error) {
             //display an error
           }
