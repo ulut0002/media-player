@@ -103,6 +103,14 @@ function trackPositionChanged(player_key, newPosition) {
   return createEvent(type, data);
 }
 
+function playModeEvent(newMode) {
+  const type = `change-play-mode`;
+  const data = {
+    mode: newMode,
+  };
+  return createEvent(type, data);
+}
+
 function trackIsPlaying(
   player_key,
   currentPositionInMs,

@@ -164,7 +164,6 @@ class Controls extends HTMLElement {
       case "repeat_one":
         this.repeatOne();
         break;
-
       default:
         break;
     }
@@ -260,18 +259,21 @@ class Controls extends HTMLElement {
   }
 
   shuffle() {
+    // this means the user clicked on "shuffle" button, so current mode is regular
     this.#dom.btnShuffle.classList.add("hide");
     this.#dom.btnRepeat.classList.remove("hide");
     this.#dom.btnRepeatOne.classList.add("hide");
   }
 
   repeat() {
+    // this means the user clicked on "regular/repeat" button, so current mode is repeat1
     this.#dom.btnShuffle.classList.add("hide");
     this.#dom.btnRepeat.classList.add("hide");
     this.#dom.btnRepeatOne.classList.remove("hide");
   }
 
   repeatOne() {
+    // this means the user clicked on "repeatOne" button, so current mode is shuffle
     this.#dom.btnShuffle.classList.remove("hide");
     this.#dom.btnRepeat.classList.add("hide");
     this.#dom.btnRepeatOne.classList.add("hide");

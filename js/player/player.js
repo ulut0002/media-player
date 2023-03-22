@@ -155,6 +155,12 @@ class Player extends HTMLElement {
   #currentTrackID; //represents current track id.. must be within #tracks
   #imagePath = "";
   #mediaPath = "";
+  #playMode;
+  PLAY_MODES = {
+    REGULAR: "Regular",
+    SHUFFLE: "Shuffle",
+    REPEAT: "Repeat",
+  };
 
   // dom elements
   #dom = {
@@ -177,6 +183,8 @@ class Player extends HTMLElement {
     if (!this.player_key) {
       this.player_key = generateRandomString(10);
     }
+
+    this.#playMode = this.PLAY_MODES.REGULAR;
 
     this.#dom.playerDiv = this.root.getElementById("player");
     this.#dom.playlistDiv = this.root.getElementById("playlist");
