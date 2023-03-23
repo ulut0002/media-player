@@ -103,8 +103,8 @@ function trackPositionChanged(player_key, newPosition) {
   return createEvent(type, data);
 }
 
-function playModeEvent(newMode) {
-  const type = `change-play-mode`;
+function playModeEvent(player_key, newMode) {
+  const type = `change-play-mode-${player_key}`;
   const data = {
     mode: newMode,
   };
@@ -157,4 +157,5 @@ export {
   playNext,
   playPrevious,
   playEventById,
+  playModeEvent,
 };
