@@ -146,12 +146,7 @@ class TrackProgress extends HTMLElement {
       switch (attrName) {
         case "player_key":
           const oldEventType = `track-is-playing-${this.#data.player_key}`;
-          // if (EventTarget.hasEventListener(oldEventType)) {
-          //   document.removeEventListener(oldEventType);
-          // }
-
           this.#data.player_key = newVal;
-
           //the event listener is here because this is the only place to access to the player_key.
           //connectedCallback() does not read the player_key field
           document.addEventListener(

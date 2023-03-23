@@ -406,7 +406,7 @@ class Track extends HTMLElement {
       // every second
       this.#timerInterval = setInterval(() => {
         this.handleOnTimeUpdate();
-      }, 1000);
+      }, 100);
     } else {
       this.#data.audio.pause();
       if (options.full) this.#headerDiv.classList.remove("playing");
