@@ -120,7 +120,7 @@ function trackIsPlaying(
   if (!totalDuration) return null;
   if (!currentPositionInMs) currentPositionInMs = 0;
   const ratio = currentPositionInMs / totalDuration;
-  const pct = Math.floor(ratio * 100);
+  const pct = Math.floor(ratio * 10000);
 
   const type = `track-is-playing-${player_key}`;
   const data = {
