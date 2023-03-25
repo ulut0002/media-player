@@ -1,6 +1,11 @@
 import VolumeSlider from "./volume-slider.js";
 import TrackProgress from "./track_progress.js";
-import { controlTrackEvent, playNext, playPrevious } from "./player-event.js";
+import {
+  controlTrackEvent,
+  playModeEvent,
+  playNext,
+  playPrevious,
+} from "./player-event.js";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -81,9 +86,9 @@ template.innerHTML = `
       </span>
 
       <slot name="shuffle">
-        <span class="material-symbols-outlined player-control-icon" id="shuffle" title="Shuffle mode">shuffle</span>
-        <span class="material-symbols-outlined player-control-icon hide" id="repeat" title="Repeat playlist">repeat</span>
-        <span class="material-symbols-outlined player-control-icon hide" id="repeat_one" title="Repeat current track">repeat_one</span>
+        <span class="material-symbols-outlined player-control-icon hide" id="shuffle" title="Shuffle mode">shuffle</span>
+        <span class="material-symbols-outlined player-control-icon" id="repeat" title="Repeat playlist">repeat</span>
+
       </slot>
     </div>
 
@@ -161,10 +166,6 @@ class Controls extends HTMLElement {
       case "repeat":
         this.repeat();
         break;
-      case "repeat_one":
-        this.repeatOne();
-        break;
-
       default:
         break;
     }
@@ -260,21 +261,23 @@ class Controls extends HTMLElement {
   }
 
   shuffle() {
+    // this means the user clicked on "shuffle" button, so current mode is regular
     this.#dom.btnShuffle.classList.add("hide");
     this.#dom.btnRepeat.classList.remove("hide");
-    this.#dom.btnRepeatOne.classList.add("hide");
+    const event = playModeEvent(this.#data.player_key, {
+      mode: "regular",
+    });
+    document.dispatchEvent(event);
   }
 
   repeat() {
-    this.#dom.btnShuffle.classList.add("hide");
-    this.#dom.btnRepeat.classList.add("hide");
-    this.#dom.btnRepeatOne.classList.remove("hide");
-  }
-
-  repeatOne() {
+    // this means the user clicked on "regular/repeat" button, so current mode is shuffle
     this.#dom.btnShuffle.classList.remove("hide");
     this.#dom.btnRepeat.classList.add("hide");
-    this.#dom.btnRepeatOne.classList.add("hide");
+    const event = playModeEvent(this.#data.player_key, {
+      mode: "shuffle",
+    });
+    document.dispatchEvent(event);
   }
 }
 

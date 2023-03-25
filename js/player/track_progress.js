@@ -90,7 +90,7 @@ template.innerHTML = `
 
   <div id="container" class="container">
       <div id="played_time" class="text played_time" title="Played time"></div>
-      <input type="range" id="progress" class="progress" name="volume" min="0" max="100" value="0" step="1" title="Progress bar">
+      <input type="range" id="progress" class="progress" name="volume" min="0" max="10000" value="0" step="1" title="Progress bar">
       <div id="remaining_time" class="text remaining_time" title="Remaining time"></div>
   </div>    
 `;
@@ -146,18 +146,14 @@ class TrackProgress extends HTMLElement {
       switch (attrName) {
         case "player_key":
           const oldEventType = `track-is-playing-${this.#data.player_key}`;
-          // if (EventTarget.hasEventListener(oldEventType)) {
-          //   document.removeEventListener(oldEventType);
-          // }
-
           this.#data.player_key = newVal;
-
           //the event listener is here because this is the only place to access to the player_key.
           //connectedCallback() does not read the player_key field
           document.addEventListener(
             `track-is-playing-${this.#data.player_key}`,
             (ev) => {
               if (this.#dom.range) {
+                //this.#dom.range.value = Math.floor(ev.detail.percentage);
                 this.#dom.range.value = Math.floor(ev.detail.percentage);
               }
               this.#dom.remainingTime.textContent = convertSecondsToHMSString(
@@ -194,7 +190,7 @@ class TrackProgress extends HTMLElement {
   handleRangeChange(ev) {
     let i = parseInt(ev.target.value);
     if (!i || isNaN(i)) i = 0;
-    this.#data.currentPosition = i;
+    this.#data.currentPosition = i / 100;
     this.firePositionChangeEvent();
 
     const event = enableDisableTrackTime(this.#data.player_key, false);

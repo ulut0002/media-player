@@ -131,15 +131,7 @@ template.innerHTML = `
 
       <div id="playlist" class="playlist"></div>
       <ulut0002-controls id="controls" class="controls"></ulut0002-controls>
-    </div>
-
-
-
-
-
-
-
-    
+    </div>    
 `;
 
 // old code
@@ -155,6 +147,15 @@ class Player extends HTMLElement {
   #currentTrackID; //represents current track id.. must be within #tracks
   #imagePath = "";
   #mediaPath = "";
+  #playMode;
+  #shuffleList;
+  #shuffleCountNext = 0;
+  #shuffleCountPrev = 0;
+  PLAY_MODES = {
+    REGULAR: "Regular",
+    SHUFFLE: "Shuffle",
+    REPEAT: "Repeat",
+  };
 
   // dom elements
   #dom = {
@@ -177,6 +178,8 @@ class Player extends HTMLElement {
     if (!this.player_key) {
       this.player_key = generateRandomString(10);
     }
+
+    this.#playMode = this.PLAY_MODES.REGULAR;
 
     this.#dom.playerDiv = this.root.getElementById("player");
     this.#dom.playlistDiv = this.root.getElementById("playlist");
@@ -233,6 +236,12 @@ class Player extends HTMLElement {
     //clear memory
   }
 
+  createShuffleTrackList() {
+    this.#shuffleList = [...this.#tracks];
+    // source for sorting arrays randomly: chatGPT
+    this.#shuffleList.sort(() => Math.random() - 0.5);
+  }
+
   buildPlayer() {
     this.#dom.previewDiv.setAttribute("player_key", this.player_key);
     let firstTrackID = "";
@@ -276,6 +285,8 @@ class Player extends HTMLElement {
         }
         this.#tracks.push(trackEl.getTrackID());
       });
+      // shuffle the array
+      this.createShuffleTrackList();
     }
 
     if (firstTrackID) {
@@ -292,40 +303,101 @@ class Player extends HTMLElement {
     this.#currentTrackID = data.id;
   }
 
+  handlePlayModeChangeEvent(data) {
+    const mode = data.detail.mode.mode.toLowerCase();
+    switch (mode) {
+      case "regular":
+        this.#playMode = this.PLAY_MODES.REGULAR;
+        break;
+      case "shuffle":
+        this.#playMode = this.PLAY_MODES.SHUFFLE;
+        break;
+      case "repeat":
+        this.#playMode = this.PLAY_MODES.REPEAT;
+        break;
+    }
+  }
+
   getCurrentTrackIndex() {
     if (!this.#currentTrackID) return 0;
+    let sourceArray = this.#tracks;
+    if (this.#playMode === this.PLAY_MODES.SHUFFLE) {
+      sourceArray = this.#shuffleList;
+    }
 
-    const idx = this.#tracks.findIndex(
-      (track) => track == this.#currentTrackID
-    );
+    const idx = sourceArray.findIndex((track) => track == this.#currentTrackID);
     return idx;
   }
 
   playNextTrack() {
     let currentTrackIdx = this.getCurrentTrackIndex();
-    let nextTrackIdx = currentTrackIdx + 1;
+    let nextTrackIdx = 0;
+    let sourceList = this.#tracks;
+    switch (this.#playMode) {
+      case this.PLAY_MODES.REGULAR:
+        nextTrackIdx = currentTrackIdx + 1;
+        break;
+      case this.PLAY_MODES.REPEAT:
+        nextTrackIdx = currentTrackIdx;
+        break;
+      case this.PLAY_MODES.SHUFFLE:
+        this.#shuffleCountNext++;
+        if (this.#shuffleCountNext >= this.#shuffleList.length) {
+          this.#shuffleCountNext = 0;
+          this.#shuffleCountPrev = 0;
+          this.#shuffleList.sort(() => Math.random() - 0.5);
+        }
+        sourceList = this.#shuffleList;
+        nextTrackIdx = currentTrackIdx + 1;
+        break;
+      default:
+        nextTrackIdx = currentTrackIdx + 1;
+        break;
+    }
     if (nextTrackIdx >= this.#tracks.length) {
       nextTrackIdx = 0;
     }
 
-    const nextTrack = this.#tracks.at(nextTrackIdx);
+    const nextTrack = sourceList.at(nextTrackIdx);
     this.firePlayTrackEvent(nextTrack);
   }
 
   playPreviousTrack() {
     let currentTrackIdx = this.getCurrentTrackIndex();
-    let nextTrackIdx = currentTrackIdx - 1;
-    if (nextTrackIdx < 0) {
-      nextTrackIdx = this.#tracks.length - 1;
-    }
+    let nextTrackIdx = 0;
+    let sourceList = this.#tracks;
 
-    const nextTrack = this.#tracks.at(nextTrackIdx);
+    switch (this.#playMode) {
+      case this.PLAY_MODES.REGULAR:
+        nextTrackIdx = currentTrackIdx - 1;
+        break;
+      case this.PLAY_MODES.REPEAT:
+        nextTrackIdx = currentTrackIdx;
+        break;
+      case this.PLAY_MODES.SHUFFLE:
+        this.#shuffleCountPrev++;
+        if (this.#shuffleCountPrev >= this.#shuffleList.length) {
+          this.#shuffleCountNext = 0;
+          this.#shuffleCountPrev = 0;
+          this.#shuffleList.sort(() => Math.random() - 0.5);
+        }
+
+        sourceList = this.#shuffleList;
+        nextTrackIdx = currentTrackIdx - 1;
+        break;
+      default:
+        nextTrackIdx = currentTrackIdx - 1;
+        break;
+    }
+    if (nextTrackIdx >= this.#tracks.length) {
+      nextTrackIdx = 0;
+    }
+    const nextTrack = sourceList.at(nextTrackIdx);
     this.firePlayTrackEvent(nextTrack);
   }
 
   firePlayTrackEvent(trackID) {
     if (!trackID) return;
-    // console.log("here");
     const event = playEventById({
       player_key: this.player_key,
       id: trackID,
@@ -344,6 +416,10 @@ class Player extends HTMLElement {
 
     document.addEventListener(`play-next-${this.player_key}`, (ev) => {
       this.playNextTrack.call(this);
+    });
+
+    document.addEventListener(`change-play-mode-${this.player_key}`, (ev) => {
+      this.handlePlayModeChangeEvent.call(this, ev);
     });
   }
 

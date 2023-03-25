@@ -103,6 +103,14 @@ function trackPositionChanged(player_key, newPosition) {
   return createEvent(type, data);
 }
 
+function playModeEvent(player_key, newMode) {
+  const type = `change-play-mode-${player_key}`;
+  const data = {
+    mode: newMode,
+  };
+  return createEvent(type, data);
+}
+
 function trackIsPlaying(
   player_key,
   currentPositionInMs,
@@ -112,7 +120,7 @@ function trackIsPlaying(
   if (!totalDuration) return null;
   if (!currentPositionInMs) currentPositionInMs = 0;
   const ratio = currentPositionInMs / totalDuration;
-  const pct = Math.floor(ratio * 100);
+  const pct = Math.floor(ratio * 10000);
 
   const type = `track-is-playing-${player_key}`;
   const data = {
@@ -149,4 +157,5 @@ export {
   playNext,
   playPrevious,
   playEventById,
+  playModeEvent,
 };
