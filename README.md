@@ -2,6 +2,8 @@
 
 A simple, customizable media player built with JavaScript and Web Components. This media player supports audio and video playback, and it offers a variety of features to enhance the user experience.
 
+Try at https://ulut0002.github.io/media-player/
+
 ## Features
 
 - Play, pause, and stop media files
